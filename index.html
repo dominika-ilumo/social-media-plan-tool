@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="nl-BE">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social media plan tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEDE5;
+    --card:#FBFAF5;
+    --ink:#211E1A;
+    --muted:#6E675B;
+    --line:#DCD6C8;
+    --accent:#2F4A3C;      /* diep evergreen */
+    --accent-soft:#EAF0EB;
+    /* pillar palet, gedempt editorial */
+    --p0:#B77F35; --p1:#B0573F; --p2:#6F8763; --p3:#77577A; --p4:#4F6E80; --p5:#8A7A46;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Hanken Grotesk",system-ui,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:32px 22px 80px}
+  .eyebrow{
+    font-family:"Space Mono",monospace;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px;
+  }
+  h1{
+    font-family:"Fraunces",serif;font-weight:500;
+    font-size:clamp(34px,6vw,58px);line-height:1.02;margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  .lede{font-size:clamp(15px,2.2vw,18px);color:var(--muted);max-width:56ch;margin:0}
+  header.hero{border-bottom:1px solid var(--line);padding-bottom:30px;margin-bottom:8px}
+
+  .step{padding:34px 0;border-bottom:1px solid var(--line)}
+  .step-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+  .step-num{font-family:"Space Mono",monospace;font-size:13px;color:var(--accent);letter-spacing:.1em}
+  .step-title{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(22px,3.4vw,30px);margin:0}
+  .step-sub{color:var(--muted);font-size:14.5px;margin:2px 0 22px;max-width:60ch}
+
+  /* pillars */
+  .pillars{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .pill{
+    display:flex;align-items:center;gap:9px;background:var(--card);
+    border:1px solid var(--line);border-radius:999px;padding:7px 12px 7px 10px;
+  }
+  .dot{width:13px;height:13px;border-radius:50%;flex:none}
+  .pill input{
+    border:none;background:transparent;font:inherit;font-size:14px;color:var(--ink);
+    width:auto;min-width:60px;max-width:200px;padding:0;
+  }
+  .pill input:focus{outline:none}
+  .pill .x{
+    border:none;background:transparent;color:var(--muted);cursor:pointer;
+    font-size:16px;line-height:1;padding:0 2px;
+  }
+  .pill .x:hover{color:var(--p1)}
+  .ghost-btn{
+    font:inherit;font-size:13.5px;color:var(--accent);background:transparent;
+    border:1px dashed var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;
+  }
+  .ghost-btn:hover{background:var(--accent-soft)}
+
+  .voice-wrap{margin-top:20px}
+  .theme-wrap{display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:4px}
+  .theme-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .theme-row .tnr{font-family:"Space Mono",monospace;font-size:12px;color:var(--accent);flex:none;width:20px}
+  .theme-row input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;font:inherit;font-size:14px;color:var(--ink);padding:10px 12px}
+  .theme-row input:focus{outline:none;border-color:var(--accent)}
+  .theme-row .x{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:17px;line-height:1;padding:0 4px}
+  .theme-row .x:hover{color:var(--p1)}
+  .theme-wrap textarea{min-height:64px}
+  label.lbl{
+    display:block;font-family:"Space Mono",monospace;font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;
+  }
+  textarea,.idea{
+    width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    font:inherit;color:var(--ink);padding:12px 14px;resize:vertical;
+  }
+  textarea:focus,.idea:focus{outline:none;border-color:var(--accent)}
+  textarea{min-height:96px;font-size:14.5px}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:7px}
+
+  /* batch list, de rode draad loopt erdoor */
+  .batch{position:relative;margin-top:6px}
+  .row{
+    display:grid;grid-template-columns:34px 150px 1fr auto;gap:14px;align-items:start;
+    padding:16px 0;border-top:1px solid var(--line);position:relative;
+  }
+  .row:first-child{border-top:none}
+  .frame-no{font-family:"Space Mono",monospace;font-size:13px;color:var(--muted);padding-top:9px}
+  .row select{
+    width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    font:inherit;font-size:13.5px;color:var(--ink);padding:9px 10px;cursor:pointer;
+  }
+  .row select:focus{outline:none;border-color:var(--accent)}
+  .cell-idea{display:flex;flex-direction:column;gap:8px}
+  .sel-wrap{display:flex;flex-direction:column;gap:8px}
+  .fmt-select{color:var(--muted)}
+  .idea{font-size:14px}
+  .cap{
+    background:var(--accent-soft);border:1px solid #d5e0d6;border-radius:10px;
+    padding:11px 13px;font-size:13.5px;white-space:pre-wrap;color:#2a3a30;
+  }
+  .cap[contenteditable]:focus{outline:1px solid var(--accent)}
+  .row-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .gen{
+    font:inherit;font-size:12.5px;font-weight:600;background:var(--accent);color:#fff;
+    border:none;border-radius:9px;padding:9px 13px;cursor:pointer;white-space:nowrap;
+  }
+  .gen:hover{background:#263d31}
+  .gen:disabled{opacity:.55;cursor:wait}
+  .del{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:13px}
+  .del:hover{color:var(--p1)}
+  .add-row{margin-top:18px}
+
+  /* feed / contactblad */
+  .feed-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:100%;
+    background:var(--ink);padding:8px;border-radius:14px;
+  }
+  .tile{
+    aspect-ratio:3/4;border-radius:6px;position:relative;overflow:hidden;
+    display:flex;align-items:flex-end;padding:9px;
+    background:#2a2721;cursor:grab;
+  }
+  .tile:active{cursor:grabbing}
+  .tile .tnum{
+    position:absolute;top:7px;left:8px;font-family:"Space Mono",monospace;
+    font-size:10px;color:rgba(255,255,255,.75);
+  }
+  .tile .tname{font-size:11px;font-weight:600;color:#fff;line-height:1.2}
+  .tile.empty{background:#33302a;border:1px dashed #4a463d}
+  .tile.empty .tname{color:#7a756a;font-weight:400}
+  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none}
+  .drag-handle{position:absolute;bottom:7px;right:7px;z-index:3;font-size:15px;line-height:1;letter-spacing:-3px;color:rgba(255,255,255,.72);background:rgba(0,0,0,.4);border-radius:6px;padding:3px 7px 3px 4px;cursor:grab;touch-action:none;user-select:none}
+  .drag-handle:active{cursor:grabbing}
+  .tile.dragging{opacity:.35}
+  .tile.drag-over{outline:3px solid var(--accent);outline-offset:2px}
+  .tile .scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,0) 55%)}
+  .tile .tnum,.tile .tname{z-index:2}
+  .tile .pbar{position:absolute;top:0;left:0;right:0;height:5px;z-index:2}
+  .tile .fmt-badge{position:absolute;top:7px;right:8px;z-index:2;font-family:"Space Mono",monospace;font-size:10px;color:#fff;background:rgba(0,0,0,.4);border-radius:4px;padding:1px 5px}
+  .photo-btn{border:none;background:transparent;color:var(--accent);cursor:pointer;font-size:12.5px;text-decoration:underline;padding:0}
+  .photo-btn:hover{color:#263d31}
+
+  .balance{margin-top:8px}
+  .bal-bar{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--line)}
+  .bal-seg{height:100%}
+  .bal-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px}
+  .bal-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+  .bal-item b{color:var(--ink);font-family:"Space Mono",monospace;font-weight:700;font-size:12.5px}
+
+  .two-col{display:grid;grid-template-columns:3fr 2fr;gap:34px;align-items:start}
+  @media(max-width:720px){
+    .row{grid-template-columns:28px 1fr;gap:10px}
+    .row .frame-no{grid-row:1;grid-column:1}
+    .row .sel-wrap{grid-column:2}
+    .cell-idea{grid-column:1/3}
+    .row-actions{grid-column:1/3;flex-direction:row;align-items:center}
+    .two-col{grid-template-columns:1fr;gap:22px}
+    .feed-grid{max-width:100%}
+  }
+
+  footer.bar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+    padding-top:26px;
+  }
+  .primary{
+    font:inherit;font-weight:600;font-size:14px;background:var(--ink);color:var(--paper);
+    border:none;border-radius:11px;padding:12px 20px;cursor:pointer;
+  }
+  .primary:hover{background:#000}
+  .link-btn{font:inherit;font-size:13.5px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline}
+  .link-btn:hover{color:var(--ink)}
+  .saved{font-family:"Space Mono",monospace;font-size:11px;color:var(--accent);letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">Eén dag plannen · de hele maand rust</p>
+    <h1>Social media plan tool</h1>
+    <p class="lede">Een hulpmiddel om elke maand strategisch geplande content te publiceren, zonder de dagelijkse twijfel en stress. Je verschuift van elke-dag-content-stress naar één dag shooten en één dag alles voorbereiden en inplannen. Daarna staat je hele maand klaar.</p>
+  </header>
+
+  <!-- STAP 1 -->
+  <section class="step">
+    <div class="step-head"><span class="step-num">01</span><h2 class="step-title">Jouw vaste basis</h2></div>
+    <p class="step-sub">Dit vul je één keer in en het blijft elke maand staan. Heb je al een skill of merkgids? Plak die gerust. Zo niet, beschrijf jezelf gewoon hieronder. Op deze basis schrijft de AI captions die als jou klinken.</p>
+
+    <label class="lbl">Content categorieën</label>
+    <div class="pillars" id="pillars"></div>
+    <button class="ghost-btn" id="addPillar">+ categorie</button>
+
+    <div class="voice-wrap">
+      <label class="lbl" for="skill">Jouw verhaal</label>
+      <textarea id="skill" placeholder="Beschrijf wie je bent, voor wie je schrijft (doelgroep), je tone of voice, je aanbod, en wat je NIET wil horen. Dit wordt je vaste basis voor elke maand."></textarea>
+      <p class="hint">Alles wat je hier schrijft, wordt bij élke caption automatisch meegegeven, dus je hoeft je context nooit meer opnieuw uit te leggen.</p>
+    </div>
+  </section>
+
+  <!-- STAP 2: THEMA -->
+  <section class="step">
+    <div class="step-head"><span class="step-num">02</span><h2 class="step-title">Thema's van de maand</h2></div>
+    <p class="step-sub">Een paar invalshoeken die als rode draad door je maand lopen. De AI rouleert hier doorheen, zodat je posts afwisselen in plaats van rond één thema te blijven hangen. Vul ze zelf in, of laat de AI een voorstel doen.</p>
+    <div id="themes"></div>
+    <div class="theme-wrap" style="flex-direction:row;flex-wrap:wrap;gap:10px;margin-top:4px">
+      <button class="ghost-btn" id="addTheme">+ thema</button>
+      <button class="gen" id="themeBtn">Laat AI thema's voorstellen</button>
+    </div>
+    <p class="hint">Elke post krijgt om de beurt een van deze thema's mee, zodat je maand afwisselt en toch samenhangt.</p>
+  </section>
+
+  <!-- STAP 3 -->
+  <section class="step">
+    <div class="step-head"><span class="step-num">03</span><h2 class="step-title">Batch je posts</h2></div>
+    <p class="step-sub">Laat de AI per post een idee én het best passende formaat (reel, post of carrousel) voorstellen. Je mag beide overschrijven. Klik daarna op ‘Schrijf caption’: die houdt meteen rekening met het formaat. Jij bent de eindredacteur, klik in een caption om aan te passen.</p>
+    <div class="batch" id="batch"></div>
+    <button class="ghost-btn add-row" id="addRow">+ post</button>
+  </section>
+
+  <!-- STAP 4 -->
+  <section class="step">
+    <div class="step-head"><span class="step-num">04</span><h2 class="step-title">Feed &amp; balans</h2></div>
+    <p class="step-sub">Je feed in 3:4 (het huidige Instagram-formaat), met je eigen foto's erin. Zie je een rode draad, of springt er één categorie te veel uit? Zo controleer je of je strategie zichtbaar is vóór je plant.</p>
+    <div class="two-col">
+      <div>
+        <label class="lbl">Feed-preview</label>
+        <p class="hint" style="margin-top:-2px;margin-bottom:12px">Zoals op Instagram: je nieuwste post (hoogste nummer) staat linksboven, oudere schuiven naar onder. De nummers blijven je planningsvolgorde. Sleep een tegel om te herschikken; de volledige post (foto, categorie, formaat, idee en caption) schuift mee.</p>
+        <div class="feed-grid" id="feed"></div>
+      </div>
+      <div class="balance">
+        <label class="lbl">Verdeling per categorie</label>
+        <div class="bal-bar" id="balBar"></div>
+        <div class="bal-legend" id="balLegend"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bar">
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <button class="primary" id="tableBtn">Kopieer als tabel</button>
+      <button class="primary" id="csvBtn" style="background:var(--accent)">Download .csv</button>
+      <button class="link-btn" id="copyBtn">Kopieer als tekst</button>
+      <button class="link-btn" id="resetBtn">Leegmaken</button>
+    </div>
+    <span class="saved" id="savedTag"></span>
+  </footer>
+
+  <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-top:26px;text-align:center">
+    VERSIE 21 · 3 OKT 2026 · FEED-PREVIEW NIEUWSTE BOVENAAN
+  </p>
+
+</div>
+
+<script>
+const COLORS = ['var(--p0)','var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)'];
+const HEX = {'var(--p0)':'#B77F35','var(--p1)':'#B0573F','var(--p2)':'#6F8763','var(--p3)':'#77577A','var(--p4)':'#4F6E80','var(--p5)':'#8A7A46'};
+
+function defaultPillars(){
+  return [
+    {id:'a', name:'Educatie',   color:COLORS[2]},
+    {id:'b', name:'Inspiratie', color:COLORS[0]},
+    {id:'c', name:'Autoriteit', color:COLORS[4]},
+    {id:'d', name:'Aanbod',     color:COLORS[3]},
+  ];
+}
+let state = {
+  pillars: defaultPillars(),
+  skill: '',
+  themes: ['','','',''],
+  posts: Array.from({length:9}, (_,i)=>({id:'p'+i, pillarId:'', idea:'', caption:'', photo:'', format:''})),
+};
+
+/* ---------- persistentie ---------- */
+async function save(){
+  try{
+    const photos={};
+    const lean = {...state, posts: state.posts.map(p=>{ if(p.photo) photos[p.id]=p.photo; const {photo, ...rest}=p; return rest; })};
+    localStorage.setItem('smplan:v1', JSON.stringify(lean));
+    localStorage.setItem('smplan:v1:photos', JSON.stringify(photos));
+    flash('bewaard ✓');
+  }catch(e){ /* opslag niet beschikbaar, stil negeren */ }
+}
+async function load(){
+  try{
+    const r = localStorage.getItem('smplan:v1');
+    if(r){
+      const loaded = JSON.parse(r);
+      if(loaded.voice && !loaded.skill){ loaded.skill = loaded.voice; }   // migratie oude versie
+      if(!Array.isArray(loaded.themes)){ loaded.themes = loaded.theme ? [loaded.theme] : ['','','','']; }  // migratie enkel thema -> lijst
+      delete loaded.theme;
+      state = loaded;
+    }
+  }catch(e){}
+  try{
+    const pr = localStorage.getItem('smplan:v1:photos');
+    if(pr){
+      const photos = JSON.parse(pr);
+      state.posts.forEach(p=>{ if(photos[p.id]) p.photo = photos[p.id]; });
+    }
+  }catch(e){}
+  renderAll();
+}
+let flashT;
+function flash(msg){
+  const tag = document.getElementById('savedTag');
+  tag.textContent = msg;
+  clearTimeout(flashT);
+  flashT = setTimeout(()=>{ tag.textContent=''; }, 1800);
+}
+const debSave = (()=>{let t;return()=>{clearTimeout(t);t=setTimeout(save,600);};})();
+
+/* ---------- render: pillars ---------- */
+function renderPillars(){
+  const el = document.getElementById('pillars');
+  el.innerHTML = '';
+  state.pillars.forEach(p=>{
+    const d = document.createElement('div');
+    d.className='pill';
+    d.innerHTML = `<span class="dot" style="background:${p.color}"></span>`;
+    const inp = document.createElement('input');
+    inp.value = p.name; inp.size = Math.max(p.name.length,6);
+    inp.oninput = ()=>{ p.name=inp.value; inp.size=Math.max(inp.value.length,6); renderPostSelectors(); renderFeed(); renderBalance(); debSave(); };
+    const x = document.createElement('button');
+    x.className='x'; x.textContent='×'; x.title='Verwijder pillar';
+    x.onclick = ()=>{ state.pillars = state.pillars.filter(q=>q.id!==p.id);
+      state.posts.forEach(po=>{ if(po.pillarId===p.id) po.pillarId=''; });
+      renderAll(); debSave(); };
+    d.appendChild(inp); d.appendChild(x);
+    el.appendChild(d);
+  });
+}
+document.getElementById('addPillar').onclick = ()=>{
+  const used = state.pillars.map(p=>p.color);
+  const color = COLORS.find(c=>!used.includes(c)) || COLORS[state.pillars.length % COLORS.length];
+  state.pillars.push({id:'pil'+Date.now(), name:'Nieuwe pillar', color});
+  renderAll(); debSave();
+};
+
+/* ---------- render: batch rijen ---------- */
+const FORMATS = ['Reel','Post','Carrousel','Talking head video'];
+
+/* ---------- Instagram best practices (2026) ---------- */
+const IG_2026 = `Instagram best practices 2026 (hou hier rekening mee):
+- De sterkste signalen zijn watch time, sends per reach (hoe vaak een post via DM gedeeld wordt) en likes per reach. Shares/DM's wegen nu het zwaarst: schrijf zo dat iemand de post naar een vriendin wil sturen of wil opslaan.
+- Captions zijn zoekbaar: gebruik natuurlijke, zoekwoord-rijke taal die beschrijft waar de post over gaat (caption-SEO vervangt de hashtag-strategie).
+- Begin een caption nooit met je naam, "Hi!" of "Nieuwe post!". Start met een hook.
+- Vraag gericht om interactie waar het past (reageren, opslaan, delen/doorsturen).`;
+const FORMAT_GUIDE = {
+  'Reel': `Reel (voor bereik en ontdekking): de video draagt de boodschap, de caption is KORT. Open met een sterke hook in de eerste 1,5 tot 3 seconden, ook leesbaar met geluid uit. De caption voegt context toe die niet in de video staat en eindigt met één duidelijke CTA.`,
+  'Carrousel': `Carrousel (voor engagement en saves): bouw mee rond de slide-logica. 1) Pak de aandacht met een hook (slide 1 is een hook, geen titel; slide 2 is een back-up hook). 2) Eén boodschap per slide. 3) Houd het simpel. 4) Stuur de volger met een duidelijke CTA (swipe, opslaan, delen). 5 tot 8 slides werkt best. De caption teast, geeft waarde en vraagt expliciet om opslaan of reageren.`,
+  'Post': `Post (statisch beeld, voor merkidentiteit): de caption draagt zelf het volledige verhaal en mag wat langer. Sterke eerste zin als hook, dan het verhaal, eindig met een vraag of CTA.`,
+  'Talking head video': `Talking head video: jij spreekt recht in de camera. Sterke hook in de eerste seconden, de caption ondersteunt, vat de kern samen en nodigt uit om te kijken en te reageren.`
+};
+/* ordered overzicht van de maand, voor flow en samenhang */
+function monthPlan(current){
+  const lines = state.posts.map((p,i)=>{
+    const parts = [];
+    if(p.format) parts.push(p.format);
+    const cat = state.pillars.find(q=>q.id===p.pillarId);
+    if(cat) parts.push(cat.name);
+    const idea = (p.idea||'').trim();
+    if(!idea && !parts.length) return null;
+    const mark = (current && p.id===current.id) ? '  <-- DEZE post' : '';
+    return `${String(i+1).padStart(2,'0')}. ${parts.join(', ')}${(parts.length&&idea)?': ':''}${idea}${mark}`;
+  }).filter(Boolean);
+  return lines.join('\n');
+}
+function formatOptions(selVal){
+  let o = `<option value="">formaat…</option>`;
+  FORMATS.forEach(f=>{ o+=`<option value="${f}" ${f===selVal?'selected':''}>${f}</option>`; });
+  return o;
+}
+function pillarOptions(sel){
+  let o = `<option value="">kies een categorie</option>`;
+  state.pillars.forEach(p=>{ o+=`<option value="${p.id}" ${p.id===sel?'selected':''}>${escapeHtml(p.name)}</option>`; });
+  return o;
+}
+function renderBatch(){
+  const el = document.getElementById('batch');
+  el.innerHTML='';
+  state.posts.forEach((post,i)=>{
+    const row = document.createElement('div'); row.className='row';
+
+    const no = document.createElement('div'); no.className='frame-no';
+    no.textContent = String(i+1).padStart(2,'0');
+
+    const selWrap = document.createElement('div'); selWrap.className='sel-wrap';
+    const sel = document.createElement('select');
+    sel.innerHTML = pillarOptions(post.pillarId);
+    sel.onchange = ()=>{ post.pillarId=sel.value; renderFeed(); renderBalance(); debSave(); };
+    const fmt = document.createElement('select'); fmt.className='fmt-select';
+    fmt.innerHTML = formatOptions(post.format);
+    fmt.onchange = ()=>{ post.format=fmt.value; renderFeed(); debSave(); };
+    selWrap.appendChild(sel); selWrap.appendChild(fmt);
+
+    const cell = document.createElement('div'); cell.className='cell-idea';
+    const idea = document.createElement('input');
+    idea.className='idea'; idea.placeholder='Waar gaat deze post over? (één regel)';
+    idea.value = post.idea;
+    idea.oninput = ()=>{ post.idea=idea.value; debSave(); };
+    cell.appendChild(idea);
+    const ideaBtn = document.createElement('button');
+    ideaBtn.className='photo-btn'; ideaBtn.style.alignSelf='flex-start';
+    ideaBtn.textContent = post.idea ? 'ander idee' : 'stel idee voor';
+    ideaBtn.onclick = ()=>suggestIdea(post, ideaBtn);
+    cell.appendChild(ideaBtn);
+    if(post.caption){
+      const cap = document.createElement('div');
+      cap.className='cap'; cap.contentEditable=true; cap.textContent=post.caption;
+      cap.oninput = ()=>{ post.caption=cap.textContent; debSave(); };
+      cell.appendChild(cap);
+      const fixBtn = document.createElement('button');
+      fixBtn.className='photo-btn'; fixBtn.style.alignSelf='flex-start';
+      fixBtn.textContent='verbeter tekst';
+      fixBtn.onclick = ()=>improveCaption(post, fixBtn);
+      cell.appendChild(fixBtn);
+    }
+
+    const actions = document.createElement('div'); actions.className='row-actions';
+    const gen = document.createElement('button');
+    gen.className='gen'; gen.textContent = post.caption ? 'Herschrijf' : 'Schrijf caption';
+    gen.onclick = ()=>generate(post, gen);
+
+    const fileInp = document.createElement('input');
+    fileInp.type='file'; fileInp.accept='image/*'; fileInp.style.display='none';
+    fileInp.onchange = ()=>{ if(fileInp.files[0]) addPhoto(post, fileInp.files[0]); };
+    const photoBtn = document.createElement('button');
+    photoBtn.className='photo-btn';
+    photoBtn.textContent = post.photo ? 'foto wijzigen' : '+ foto';
+    photoBtn.onclick = ()=>fileInp.click();
+
+    const del = document.createElement('button');
+    del.className='del'; del.textContent='verwijder';
+    del.onclick = ()=>{ state.posts = state.posts.filter(p=>p.id!==post.id); renderAll(); debSave(); };
+    actions.appendChild(gen); actions.appendChild(photoBtn); actions.appendChild(fileInp); actions.appendChild(del);
+
+    row.appendChild(no); row.appendChild(selWrap); row.appendChild(cell); row.appendChild(actions);
+    el.appendChild(row);
+  });
+}
+function renderPostSelectors(){
+  document.querySelectorAll('#batch select:not(.fmt-select)').forEach((sel,i)=>{
+    sel.innerHTML = pillarOptions(state.posts[i]?.pillarId);
+  });
+}
+document.getElementById('addRow').onclick = ()=>{
+  state.posts.push({id:'p'+Date.now(), pillarId:'', idea:'', caption:'', photo:'', format:''});
+  renderBatch(); renderFeed(); renderBalance(); debSave();
+};
+
+/* ---------- AI-aanroep (rechtstreeks, zoals in v10/11) + zichtbare fouten ---------- */
+function btnMsg(btn, orig, msg, ms){ btn.disabled=false; btn.textContent=msg; setTimeout(()=>{ if(btn.textContent===msg) btn.textContent=orig; }, ms||3200); }
+function aiErr(e){
+  const m = (e && e.message) || '';
+  if(m==='unavailable') return 'AI werkt in de Claude-app';
+  if(m.indexOf('http-')===0) return 'AI: fout '+m.replace('http-','');
+  if(m==='leeg') return 'leeg antwoord, opnieuw?';
+  return 'AI lukte niet, opnieuw?';
+}
+async function callClaude(sys, usr){
+  // 1) ingebouwde Claude (werkt wanneer de tool in de Claude-app/viewer opent)
+  try{
+    const sample = (window.claude && claude.use) ? await claude.use('sample') : null;
+    if(sample){ const r = await sample(sys + '\n\n' + usr); return (r && r.text ? r.text : '').trim(); }
+  }catch(_){ /* val terug op de rechtstreekse methode */ }
+  // 2) rechtstreeks (werkte in oudere gepubliceerde versies; kan nu geblokkeerd zijn)
+  let res;
+  try{
+    res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:1000, system: sys, messages:[{role:"user", content: usr}] })
+    });
+  }catch(netErr){ throw new Error('unavailable'); }   // geblokkeerd op een publieke pagina
+  if(!res.ok) throw new Error('http-'+res.status);
+  const data = await res.json();
+  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+}
+
+/* ---------- AI: caption verbeteren / herschrijven ---------- */
+async function improveCaption(post, btn){
+  if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, 'nog geen caption'); return; }
+  const orig = btn.textContent; btn.disabled=true; btn.textContent='verbetert…';
+  const sys = `Je bent corrector en copywriter in vlot Belgisch Nederlands. Verbeter de aangeleverde caption: haal spel-, grammatica- en dt-fouten eruit, maak de zinnen vlotter en natuurlijker, maar behoud de boodschap, de toon en ongeveer de lengte. Verzin geen nieuwe inhoud.
+Behoud of verbeter de opmaak: korte alinea's met een lege regel ertussen en een CTA op een eigen regel. Lever nooit één blok tekst.
+Gebruik nooit een gedachtestreepje (— of –); gebruik een komma, punt of haakjes.
+Antwoord met ALLEEN de verbeterde caption, zonder uitleg of aanhalingstekens.`;
+  const usr = `${(state.skill||'').trim() ? 'Mijn stem en context:\n'+state.skill.trim()+'\n\n' : ''}Verbeter deze caption:\n${post.caption.trim()}`;
+  try{
+    let text = stripDashes(await callClaude(sys, usr));
+    if(text){ post.caption = text; renderBatch(); renderFeed(); debSave(); }
+    else throw new Error('leeg');
+  }catch(e){
+    btnMsg(btn, orig, aiErr(e));
+  }
+}
+
+/* ---------- AI captiongeneratie ---------- */
+async function generate(post, btn){
+  const pillar = state.pillars.find(p=>p.id===post.pillarId);
+  if(!post.idea.trim()){ idealess(btn); return; }
+  const orig = btn.textContent;
+  btn.disabled=true; btn.textContent='schrijft…';
+  const sys = `Je bent copywriter en schrijft in vlot Belgisch Nederlands (je-vorm, natuurlijk, geen stijve constructies). Je schrijft social media captions die klinken als een echt mens, nooit als AI.
+BELANGRIJKSTE REGEL: gebruik NOOIT een gedachtestreepje (— of –). Gebruik in de plaats altijd een komma, een punt of haakjes. Dit is een harde regel zonder uitzonderingen.
+Verboden: clichés zoals "In de snel veranderende wereld van vandaag", "ontketen", "naadloos", holle superlatieven, en een muur van hashtags.
+Doe wel: een sterke eerste zin als hook die op een eigen regel staat, daarna korte alinea's van één of twee zinnen met telkens een lege regel ertussen, en een duidelijke call-to-action op een eigen regel op het einde. Voor langere captions mag je een korte opsomming gebruiken (een • of een cijfer per regel). Zorg voor voldoende witruimte, lever nooit één blok tekst.
+Schrijf ALLEEN de caption zelf, zonder uitleg, aanhalingstekens of titel.`;
+  const postNr = state.posts.findIndex(p=>p.id===post.id) + 1;
+  const plan = monthPlan(post);
+  const mijnThema = themeForPost(postNr-1);
+  const usr = `Vaste basis van de ondernemer (volg dit strikt voor toon, doelgroep, stijl en aanbod):
+${(state.skill||'').trim() || '(niet opgegeven, hou het dan neutraal maar menselijk)'}
+${mijnThema ? '\nThema voor DEZE post (laat de caption hierbij aansluiten): '+mijnThema+'\n' : ''}${activeThemes().length>1 ? 'Alle thema\u0027s van de maand (de posts rouleren hierdoorheen): '+activeThemes().join(' | ')+'\n' : ''}${plan ? '\nDe hele maandplanning (voor flow en samenhang):\n'+plan+'\n' : ''}
+Deze post is nummer ${postNr} in de reeks.
+Content categorie: ${pillar ? pillar.name : 'niet gekozen'}
+Waar deze post over gaat: ${post.idea.trim()}
+${post.format ? '\nFormaat en best practices:\n'+(FORMAT_GUIDE[post.format]||'')+'\n' : ''}
+${IG_2026}
+
+Schrijf de caption zo dat ze past bij het formaat EN bij de plaats van deze post in de flow van de maand: een vroege post wekt nieuwsgierigheid of kondigt aan, een post in het midden legt uit of herinnert, een late post is een herinnering of laatste kans. Als er een thema met een aanbod of event is, laat de bijbehorende boodschap of CTA op een natuurlijke manier aansluiten bij de andere posts van de maand (als rode draad, 2 tot 4 keer terugkerend), zonder te herhalen.`;
+  try{
+    let text = stripDashes(await callClaude(sys, usr));
+    if(text){ post.caption = text; renderBatch(); renderFeed(); debSave(); }
+    else{ throw new Error('leeg'); }
+  }catch(e){
+    btnMsg(btn, orig, aiErr(e));
+  }
+}
+function idealess(btn){
+  const orig=btn.textContent; btn.textContent='vul eerst een idee in';
+  setTimeout(()=>btn.textContent=orig,1500);
+}
+
+/* ---------- AI: post-idee + formaat voorstellen ---------- */
+const IDEA_ANGLES = ['een persoonlijk verhaal','een concrete tip','een veelgemaakte fout','een vraag aan je volgers','een voor-en-na','achter de schermen','een mythe ontkrachten','een quote of inzicht','een snelle how-to','een klantresultaat','een mini-checklist','een dag-in-het-leven'];
+async function suggestIdea(post, btn){
+  if(!(state.skill||'').trim() && !activeThemes().length){
+    const o=btn.textContent; btn.textContent='vul eerst stap 1 of 2 in';
+    setTimeout(()=>btn.textContent=o,1800); return;
+  }
+  const pillar = state.pillars.find(p=>p.id===post.pillarId);
+  const postNr = state.posts.findIndex(p=>p.id===post.id) + 1;
+  const mijnThema = themeForPost(postNr-1);
+  const plan = monthPlan(post);
+  const vermijd = state.posts.filter(p=>(p.idea||'').trim()).map(p=>'- '+p.idea.trim());
+  const angle = IDEA_ANGLES[Math.floor(Math.random()*IDEA_ANGLES.length)];
+  const orig = btn.textContent; btn.disabled=true; btn.textContent='denkt na…';
+  const sys = `Je bent een contentstrateeg. Je bedenkt één concreet, origineel post-idee en kiest het best passende formaat.
+Kies het formaat uit deze vier: Reel, Post, Carrousel, Talking head video.
+- Reel: kort en dynamisch, hook-gedreven, geschikt voor beweging, demo of snelle tips.
+- Carrousel: meerdere slides, geschikt voor uitleg, stappen, lijstjes of een verhaal in delen.
+- Post: één statisch beeld, geschikt voor een moment, een quote of een aankondiging.
+- Talking head video: jij spreekt recht in de camera, geschikt voor een mening, een verhaal, uitleg of een persoonlijke boodschap.
+Antwoord met ALLEEN geldige JSON, zonder inleiding of code-fences: {"idee": "één korte zin, max 15 woorden", "formaat": "Reel"}
+Gebruik nooit een gedachtestreepje (— of –).`;
+  const usr = `Wie ik ben en wat ik doe:
+${(state.skill||'').trim() || '(niet opgegeven)'}
+${mijnThema ? '\nThema voor DEZE post (bouw het idee hierrond): '+mijnThema : ''}
+${activeThemes().length>1 ? 'Alle thema\u0027s van de maand (de posts rouleren hierdoorheen, blijf bij het thema voor deze post): '+activeThemes().join(' | ') : ''}
+${pillar ? '\nContent categorie voor deze post: '+pillar.name : ''}
+${plan ? '\nWat er al gepland staat deze maand (in volgorde):\n'+plan : ''}
+${vermijd.length ? '\nVERMIJD deze reeds geplande ideeën, geef iets duidelijk anders (niet een variant hierop):\n'+vermijd.join('\n') : ''}
+${post.idea.trim() ? '\nMijn huidige idee hier is: "'+post.idea.trim()+'". Geef een DUIDELIJK ANDER idee, een andere invalshoek, niet hetzelfde licht aangepast.' : ''}
+
+Kies deze keer bij voorkeur een invalshoek in de richting van: ${angle}.
+Stel één concreet, origineel post-idee voor dat past bij het thema voor deze post en de flow van de maand vooruithelpt. Als een thema een aanbod of event is, bouw dan een reeks op die 2 tot 4 keer terugkomt (kort aankondigen, omschrijven, herinnering, laatste kans). Wissel de formaten af (Reels voor bereik, carrousels voor engagement en saves).
+Geef één post-idee met passend formaat.`;
+  try{
+    let text = (await callClaude(sys, usr)).replace(/```json|```/g,'').trim();
+    let idee='', formaat='';
+    try{ const o=JSON.parse(text); idee=(o.idee||'').trim(); formaat=(o.formaat||'').trim(); }
+    catch(_){ idee = text; }               // fallback: gebruik de ruwe tekst als idee
+    idee = stripDashes(idee).replace(/^["'•\-\s]+/,'').trim();
+    if(FORMATS.indexOf(formaat)===-1) formaat = post.format || '';   // enkel geldige formaten
+    if(idee){ post.idea=idee; if(formaat) post.format=formaat; renderBatch(); debSave(); }
+    else throw new Error('leeg');
+  }catch(e){
+    btnMsg(btn, orig, aiErr(e));
+  }
+}
+
+/* ---------- AI: thema's van de maand voorstellen ---------- */
+async function proposeThemes(){
+  const btn = document.getElementById('themeBtn');
+  if(!(state.skill||'').trim()){
+    const o=btn.textContent; btn.textContent='vul eerst je verhaal in (stap 1)';
+    setTimeout(()=>btn.textContent=o,1900); return;
+  }
+  const emptyCount = state.themes.filter(t=>!(t||'').trim()).length;
+  const n = Math.max(emptyCount, 1);   // vul de lege vakjes, minstens 1
+  const orig = btn.textContent; btn.disabled=true; btn.textContent='denkt na…';
+  const sys = `Je bent een contentstrateeg. Je stelt ${n} verschillende maandthema's voor: elk een duidelijke, aparte invalshoek die als rode draad door de content kan lopen. Ze moeten onderling verschillen, zodat de maand afwisselt.
+Elk thema is een korte zin (een themanaam, eventueel met een paar woorden uitleg).
+Schrijf in vlot Belgisch Nederlands. Gebruik nooit een gedachtestreepje (— of –).
+Antwoord met ALLEEN geldige JSON, zonder inleiding of code-fences: {"themas": ["...", "..."]}`;
+  const usr = `Dit is wie ik ben en wat ik doe:
+${state.skill.trim()}
+${activeThemes().length ? '\nDeze thema\u0027s heb ik al, geef andere die hierop aanvullen:\n'+activeThemes().map(t=>'- '+t).join('\n')+'\n' : ''}
+Stel ${n} verschillende maandthema's voor.`;
+  try{
+    let text = (await callClaude(sys, usr)).replace(/```json|```/g,'').trim();
+    let list=[];
+    try{ const o=JSON.parse(text); if(Array.isArray(o.themas)) list=o.themas; }
+    catch(_){ list = text.split('\n').map(l=>l.replace(/^[-•\d.\s]+/,'').trim()).filter(Boolean); }
+    list = list.map(t=>stripDashes(String(t)).trim()).filter(Boolean);
+    if(!list.length) throw new Error('leeg');
+    // vul eerst de lege vakjes, voeg daarna extra toe
+    let li=0;
+    state.themes = state.themes.map(t=> (t||'').trim() ? t : (li<list.length ? list[li++] : t));
+    while(li<list.length){ state.themes.push(list[li++]); }
+    renderThemes(); debSave();
+    btn.disabled=false; btn.textContent=orig;
+  }catch(e){
+    btnMsg(btn, orig, aiErr(e));
+  }
+}
+
+/* ---------- foto's toevoegen (verkleind voor de preview) ---------- */
+function addPhoto(post, file){
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const max=360; let w=img.width, h=img.height;
+      const scale=Math.min(1, max/Math.max(w,h));
+      w=Math.round(w*scale); h=Math.round(h*scale);
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      post.photo = cv.toDataURL('image/jpeg',0.72);
+      renderBatch(); renderFeed(); debSave();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---------- render: feed contactblad ---------- */
+function renderFeed(){
+  const el = document.getElementById('feed'); el.innerHTML='';
+  // omgekeerde volgorde: nieuwste post (hoogste nummer) linksboven, zoals op Instagram.
+  // het framenummer en dataset.idx blijven je planningsvolgorde.
+  for(let i = state.posts.length - 1; i >= 0; i--){
+    const post = state.posts[i];
+    const p = state.pillars.find(q=>q.id===post.pillarId);
+    const hasPhoto = !!post.photo;
+    const t = document.createElement('div');
+    t.className = 'tile' + ((p||hasPhoto)?'':' empty');
+    if(p && !hasPhoto) t.style.background = HEX[p.color];
+    let inner = `<span class="tnum">${String(i+1).padStart(2,'0')}</span>`;
+    if(post.format) inner += `<span class="fmt-badge">${post.format[0]}</span>`;
+    if(hasPhoto){
+      inner += `<img src="${post.photo}" alt=""><div class="scrim"></div>`;
+      if(p) inner += `<span class="pbar" style="background:${HEX[p.color]}"></span>`;
+    }
+    inner += `<span class="tname">${p?escapeHtml(p.name):(hasPhoto?'':'leeg')}</span>`;
+    t.innerHTML = inner;
+    t.dataset.idx = i;
+    t.draggable = true;
+    t.addEventListener('dragstart', onDragStart);
+    t.addEventListener('dragover', onDragOver);
+    t.addEventListener('dragleave', onDragLeave);
+    t.addEventListener('drop', onDrop);
+    t.addEventListener('dragend', onDragEnd);
+    const handle = document.createElement('div');
+    handle.className = 'drag-handle'; handle.textContent = '⋮⋮'; handle.title = 'Sleep om te herschikken';
+    t.appendChild(handle);
+    el.appendChild(t);
+  }
+}
+
+/* ---------- feed herschikken via native drag-and-drop (werkt ook in gepubliceerde artifact) ---------- */
+let dragFrom = null;
+function clearDragClasses(){
+  document.querySelectorAll('#feed .dragging, #feed .drag-over')
+    .forEach(x=>x.classList.remove('dragging','drag-over'));
+}
+function onDragStart(e){
+  dragFrom = parseInt(this.dataset.idx, 10);
+  this.classList.add('dragging');
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed = 'move';
+    try{ e.dataTransfer.setData('text/plain', String(dragFrom)); }catch(_){}
+  }
+}
+function onDragOver(e){
+  e.preventDefault();                       // toestaan dat hier gedropt wordt
+  if(e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+  if(dragFrom !== null && parseInt(this.dataset.idx, 10) !== dragFrom){
+    this.classList.add('drag-over');
+  }
+}
+function onDragLeave(e){ this.classList.remove('drag-over'); }
+function onDrop(e){
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const to = parseInt(this.dataset.idx, 10);
+  const from = dragFrom;
+  dragFrom = null;
+  clearDragClasses();
+  if(from !== null && to !== from) movePost(from, to);
+}
+function onDragEnd(){ dragFrom = null; clearDragClasses(); }
+function movePost(from, to){
+  const arr = state.posts;
+  if(from < 0 || from >= arr.length) return;
+  const [item] = arr.splice(from, 1);
+  const insertAt = from < to ? to - 1 : to;
+  arr.splice(Math.max(0, Math.min(arr.length, insertAt)), 0, item);
+  renderBatch(); renderFeed(); renderBalance(); debSave();
+}
+
+/* ---------- render: balans ---------- */
+function renderBalance(){
+  const bar = document.getElementById('balBar'); const leg = document.getElementById('balLegend');
+  bar.innerHTML=''; leg.innerHTML='';
+  const counts = {}; let assigned=0;
+  state.pillars.forEach(p=>counts[p.id]=0);
+  state.posts.forEach(po=>{ if(po.pillarId && counts[po.pillarId]!==undefined){counts[po.pillarId]++; assigned++;} });
+  state.pillars.forEach(p=>{
+    const n = counts[p.id];
+    if(assigned>0){
+      const seg=document.createElement('div');
+      seg.className='bal-seg'; seg.style.background=HEX[p.color];
+      seg.style.width=(n/assigned*100)+'%';
+      bar.appendChild(seg);
+    }
+    const item=document.createElement('div'); item.className='bal-item';
+    item.innerHTML=`<span class="dot" style="background:${p.color}"></span>${escapeHtml(p.name)} <b>${n}</b>`;
+    leg.appendChild(item);
+  });
+  if(assigned===0){
+    bar.innerHTML='';
+    const s=document.createElement('div'); s.className='bal-item'; s.textContent='Nog geen posts aan een categorie toegewezen.';
+    leg.appendChild(s);
+  }
+}
+
+/* ---------- voice ---------- */
+const skillEl = document.getElementById('skill');
+skillEl.oninput = ()=>{ state.skill=skillEl.value; debSave(); };
+function renderThemes(){
+  const el = document.getElementById('themes'); el.innerHTML='';
+  state.themes.forEach((t,i)=>{
+    const row=document.createElement('div'); row.className='theme-row';
+    const nr=document.createElement('span'); nr.className='tnr'; nr.textContent=String(i+1).padStart(2,'0');
+    const inp=document.createElement('input'); inp.value=t||''; inp.placeholder='Thema '+(i+1)+' (bv. City shoot in oktober promoten)';
+    inp.oninput=()=>{ state.themes[i]=inp.value; debSave(); };
+    const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Verwijder thema';
+    x.onclick=()=>{ state.themes.splice(i,1); if(!state.themes.length) state.themes=['']; renderThemes(); debSave(); };
+    row.appendChild(nr); row.appendChild(inp); row.appendChild(x);
+    el.appendChild(row);
+  });
+}
+document.getElementById('addTheme').onclick=()=>{ state.themes.push(''); renderThemes(); debSave(); };
+document.getElementById('themeBtn').onclick=()=>proposeThemes();
+function activeThemes(){ return state.themes.map(t=>(t||'').trim()).filter(Boolean); }
+function themeForPost(index){ const ts=activeThemes(); return ts.length ? ts[index % ts.length] : ''; }
+
+/* ---------- kopieer / reset ---------- */
+document.getElementById('copyBtn').onclick = ()=>{
+  let out = `CONTENT BATCH\n\n`;
+  if(activeThemes().length) out += `Thema's van de maand:\n`+activeThemes().map(t=>'• '+t).join('\n')+`\n\n`;
+  out += `Categorieën:\n`;
+  state.pillars.forEach(p=>out+=`• ${p.name}\n`);
+  out+=`\nJouw verhaal / basis:\n${state.skill||'(leeg)'}\n\nPosts:\n`;
+  state.posts.forEach((po,i)=>{
+    const p=state.pillars.find(q=>q.id===po.pillarId);
+    out+=`\n${String(i+1).padStart(2,'0')}: ${p?p.name:'geen categorie'}${po.format?' ('+po.format+')':''}\nIdee: ${po.idea||'-'}\n${po.caption?('Caption:\n'+po.caption+'\n'):''}`;
+  });
+  navigator.clipboard.writeText(out).then(()=>flash('gekopieerd ✓'))
+    .catch(()=>flash('kopiëren lukte niet'));
+};
+
+/* ---------- export naar tabel ---------- */
+const TABLE_HEAD = ['Nr','Categorie','Format','Idee','Caption','Foto','Datum','Kanaal'];
+function flatten(s){ return (s||'').replace(/\s*\n+\s*/g,' ').replace(/\t/g,' ').replace(/\s{2,}/g,' ').trim(); }
+function tableRows(flat){
+  return state.posts.map((po,i)=>{
+    const p = state.pillars.find(q=>q.id===po.pillarId);
+    return [
+      String(i+1).padStart(2,'0'),
+      p ? p.name : '',
+      po.format || '',
+      flat ? flatten(po.idea) : (po.idea||''),
+      flat ? flatten(po.caption) : (po.caption||''),
+      po.photo ? 'ja' : '',
+      '', ''   // Datum en Kanaal: leeg om zelf in te plannen
+    ];
+  });
+}
+document.getElementById('tableBtn').onclick = ()=>{
+  const tsv = [TABLE_HEAD.join('\t'), ...tableRows(true).map(r=>r.join('\t'))].join('\n');
+  navigator.clipboard.writeText(tsv)
+    .then(()=>flash('tabel gekopieerd ✓ · plak in Sheets of Excel'))
+    .catch(()=>flash('kopiëren lukte niet'));
+};
+function csvCell(v){ v=(v==null?'':String(v)); return /[",\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+document.getElementById('csvBtn').onclick = async ()=>{
+  const rows = [TABLE_HEAD, ...tableRows(false)].map(r=>r.map(csvCell).join(','));
+  const csv = '\uFEFF' + rows.join('\r\n');   // BOM = accenten kloppen in Excel
+  try{
+    const downloads = (window.claude && claude.use) ? await claude.use('downloads') : null;
+    if(downloads){
+      await downloads.save({filename:'social-media-plan.csv', data: csv});
+      flash('csv gedownload ✓');
+      return;
+    }
+  }catch(e){ /* val terug op de klassieke methode */ }
+  try{
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='social-media-plan.csv';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    flash('csv gedownload ✓');
+  }catch(e){ flash('download lukte niet · gebruik Kopieer als tabel'); }
+};
+let resetArmed=false, resetTimer=null;
+document.getElementById('resetBtn').onclick = ()=>{
+  const btn=document.getElementById('resetBtn');
+  if(!resetArmed){
+    resetArmed=true; btn.textContent='klik nog eens om te wissen';
+    resetTimer=setTimeout(()=>{ resetArmed=false; btn.textContent='Leegmaken'; }, 3000);
+    return;
+  }
+  clearTimeout(resetTimer); resetArmed=false; btn.textContent='Leegmaken';
+  state = { pillars:defaultPillars(), skill:'', themes:['','','',''],
+    posts: Array.from({length:9},(_,i)=>({id:'p'+i,pillarId:'',idea:'',caption:'',photo:'',format:''})) };
+  renderAll(); save();
+};
+
+/* ---------- helpers ---------- */
+function escapeHtml(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function stripDashes(s){
+  return (s||'')
+    .replace(/[ \t]*[—–][ \t]*/g, ', ')   // gedachtestreepjes worden komma's (regeleindes blijven)
+    .replace(/,[ \t]*([.!?…:;])/g, '$1')  // ", ." opkuisen tot "."
+    .replace(/,[ \t]*,/g, ',')            // dubbele komma's weg
+    .replace(/[ \t]{2,}/g, ' ')           // dubbele spaties weg (geen regeleindes)
+    .replace(/[ \t]+\n/g, '\n')           // spaties op het einde van een regel weg
+    .replace(/\n{3,}/g, '\n\n')           // hoogstens één lege regel tussen alinea's
+    .trim();
+}
+function renderAll(){
+  skillEl.value = state.skill||'';
+  renderThemes();
+  renderPillars(); renderBatch(); renderFeed(); renderBalance();
+}
+
+load();
+</script>
+</body>
+</html>
