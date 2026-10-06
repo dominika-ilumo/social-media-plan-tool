@@ -107,7 +107,7 @@
   .row select:focus{outline:none;border-color:var(--accent)}
   .cell-idea{display:flex;flex-direction:column;gap:8px}
   .sel-wrap{display:flex;flex-direction:column;gap:8px}
-  .fmt-select{color:var(--muted)}
+  .fmt-select,.thm-select{color:var(--muted)}
   .idea{font-size:14px}
   .cap{
     background:var(--accent-soft);border:1px solid #d5e0d6;border-radius:10px;
@@ -255,13 +255,18 @@
       <button class="primary" id="tableBtn">Kopieer als tabel</button>
       <button class="primary" id="csvBtn" style="background:var(--accent)">Download .csv</button>
       <button class="link-btn" id="copyBtn">Kopieer als tekst</button>
+      <button class="link-btn" id="backupBtn">Back-up downloaden</button>
+      <button class="link-btn" id="restoreBtn">Back-up laden</button>
       <button class="link-btn" id="resetBtn">Leegmaken</button>
+      <input type="file" id="restoreInput" accept="application/json,.json" style="display:none">
     </div>
     <span class="saved" id="savedTag"></span>
   </footer>
 
-  <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-top:26px;text-align:center">
-    VERSIE 21 · 3 OKT 2026 · FEED-PREVIEW NIEUWSTE BOVENAAN
+  <p class="hint" style="margin-top:18px;max-width:60ch">Je werk wordt automatisch bewaard in deze browser. Wissel je van toestel of browser? Download een back-up en laad die daar opnieuw.</p>
+
+  <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-top:18px;text-align:center">
+    VERSIE 22 · 3 OKT 2026 · THEMA PER POST + BACK-UP
   </p>
 
 </div>
@@ -282,7 +287,7 @@ let state = {
   pillars: defaultPillars(),
   skill: '',
   themes: ['','','',''],
-  posts: Array.from({length:9}, (_,i)=>({id:'p'+i, pillarId:'', idea:'', caption:'', photo:'', format:''})),
+  posts: Array.from({length:9}, (_,i)=>({id:'p'+i, pillarId:'', idea:'', caption:'', photo:'', format:'', themeIdx:-1})),
 };
 
 /* ---------- persistentie ---------- */
@@ -406,7 +411,10 @@ function renderBatch(){
     const fmt = document.createElement('select'); fmt.className='fmt-select';
     fmt.innerHTML = formatOptions(post.format);
     fmt.onchange = ()=>{ post.format=fmt.value; renderFeed(); debSave(); };
-    selWrap.appendChild(sel); selWrap.appendChild(fmt);
+    const thm = document.createElement('select'); thm.className='thm-select';
+    thm.innerHTML = themeOptions(typeof post.themeIdx==='number'?post.themeIdx:-1);
+    thm.onchange = ()=>{ post.themeIdx=parseInt(thm.value,10); debSave(); };
+    selWrap.appendChild(sel); selWrap.appendChild(fmt); selWrap.appendChild(thm);
 
     const cell = document.createElement('div'); cell.className='cell-idea';
     const idea = document.createElement('input');
@@ -453,13 +461,27 @@ function renderBatch(){
     el.appendChild(row);
   });
 }
+function themeOptions(selIdx){
+  let o = `<option value="-1">thema: auto</option>`;
+  state.themes.forEach((t,ti)=>{ const tt=(t||'').trim(); if(!tt) return;
+    const disp = tt.length>42 ? tt.slice(0,40)+'…' : tt;
+    o += `<option value="${ti}" ${ti===selIdx?'selected':''}>${escapeHtml(disp)}</option>`;
+  });
+  return o;
+}
+function renderPostThemeSelects(){
+  document.querySelectorAll('#batch .thm-select').forEach((sel,i)=>{
+    const idx = (typeof state.posts[i]?.themeIdx==='number') ? state.posts[i].themeIdx : -1;
+    sel.innerHTML = themeOptions(idx);
+  });
+}
 function renderPostSelectors(){
-  document.querySelectorAll('#batch select:not(.fmt-select)').forEach((sel,i)=>{
+  document.querySelectorAll('#batch select:not(.fmt-select):not(.thm-select)').forEach((sel,i)=>{
     sel.innerHTML = pillarOptions(state.posts[i]?.pillarId);
   });
 }
 document.getElementById('addRow').onclick = ()=>{
-  state.posts.push({id:'p'+Date.now(), pillarId:'', idea:'', caption:'', photo:'', format:''});
+  state.posts.push({id:'p'+Date.now(), pillarId:'', idea:'', caption:'', photo:'', format:'', themeIdx:-1});
   renderBatch(); renderFeed(); renderBalance(); debSave();
 };
 
@@ -522,7 +544,7 @@ Doe wel: een sterke eerste zin als hook die op een eigen regel staat, daarna kor
 Schrijf ALLEEN de caption zelf, zonder uitleg, aanhalingstekens of titel.`;
   const postNr = state.posts.findIndex(p=>p.id===post.id) + 1;
   const plan = monthPlan(post);
-  const mijnThema = themeForPost(postNr-1);
+  const mijnThema = (typeof post.themeIdx==='number' && post.themeIdx>=0 && state.themes[post.themeIdx]) ? state.themes[post.themeIdx].trim() : themeForPost(postNr-1);
   const usr = `Vaste basis van de ondernemer (volg dit strikt voor toon, doelgroep, stijl en aanbod):
 ${(state.skill||'').trim() || '(niet opgegeven, hou het dan neutraal maar menselijk)'}
 ${mijnThema ? '\nThema voor DEZE post (laat de caption hierbij aansluiten): '+mijnThema+'\n' : ''}${activeThemes().length>1 ? 'Alle thema\u0027s van de maand (de posts rouleren hierdoorheen): '+activeThemes().join(' | ')+'\n' : ''}${plan ? '\nDe hele maandplanning (voor flow en samenhang):\n'+plan+'\n' : ''}
@@ -555,7 +577,7 @@ async function suggestIdea(post, btn){
   }
   const pillar = state.pillars.find(p=>p.id===post.pillarId);
   const postNr = state.posts.findIndex(p=>p.id===post.id) + 1;
-  const mijnThema = themeForPost(postNr-1);
+  const mijnThema = (typeof post.themeIdx==='number' && post.themeIdx>=0 && state.themes[post.themeIdx]) ? state.themes[post.themeIdx].trim() : themeForPost(postNr-1);
   const plan = monthPlan(post);
   const vermijd = state.posts.filter(p=>(p.idea||'').trim()).map(p=>'- '+p.idea.trim());
   const angle = IDEA_ANGLES[Math.floor(Math.random()*IDEA_ANGLES.length)];
@@ -759,14 +781,14 @@ function renderThemes(){
     const row=document.createElement('div'); row.className='theme-row';
     const nr=document.createElement('span'); nr.className='tnr'; nr.textContent=String(i+1).padStart(2,'0');
     const inp=document.createElement('input'); inp.value=t||''; inp.placeholder='Thema '+(i+1)+' (bv. City shoot in oktober promoten)';
-    inp.oninput=()=>{ state.themes[i]=inp.value; debSave(); };
+    inp.oninput=()=>{ state.themes[i]=inp.value; renderPostThemeSelects(); debSave(); };
     const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Verwijder thema';
-    x.onclick=()=>{ state.themes.splice(i,1); if(!state.themes.length) state.themes=['']; renderThemes(); debSave(); };
+    x.onclick=()=>{ state.posts.forEach(p=>{ if(p.themeIdx===i) p.themeIdx=-1; else if(typeof p.themeIdx==='number'&&p.themeIdx>i) p.themeIdx--; }); state.themes.splice(i,1); if(!state.themes.length) state.themes=['']; renderThemes(); renderPostThemeSelects(); debSave(); };
     row.appendChild(nr); row.appendChild(inp); row.appendChild(x);
     el.appendChild(row);
   });
 }
-document.getElementById('addTheme').onclick=()=>{ state.themes.push(''); renderThemes(); debSave(); };
+document.getElementById('addTheme').onclick=()=>{ state.themes.push(''); renderThemes(); renderPostThemeSelects(); debSave(); };
 document.getElementById('themeBtn').onclick=()=>proposeThemes();
 function activeThemes(){ return state.themes.map(t=>(t||'').trim()).filter(Boolean); }
 function themeForPost(index){ const ts=activeThemes(); return ts.length ? ts[index % ts.length] : ''; }
@@ -829,6 +851,43 @@ document.getElementById('csvBtn').onclick = async ()=>{
     flash('csv gedownload ✓');
   }catch(e){ flash('download lukte niet · gebruik Kopieer als tabel'); }
 };
+/* ---------- back-up: hele inhoud downloaden en terug laden ---------- */
+document.getElementById('backupBtn').onclick = async ()=>{
+  const json = JSON.stringify(state);
+  const name = 'social-media-plan-backup.json';
+  try{
+    const downloads = (window.claude && claude.use) ? await claude.use('downloads') : null;
+    if(downloads){ await downloads.save({filename:name, data:json}); flash('back-up gedownload ✓'); return; }
+  }catch(e){}
+  try{
+    const blob = new Blob([json], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=name;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    flash('back-up gedownload ✓');
+  }catch(e){ flash('download lukte niet'); }
+};
+const restoreInput = document.getElementById('restoreInput');
+document.getElementById('restoreBtn').onclick = ()=>restoreInput.click();
+restoreInput.onchange = ()=>{
+  const f = restoreInput.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const loaded = JSON.parse(reader.result);
+      if(!loaded || !Array.isArray(loaded.posts)) throw new Error('ongeldig');
+      if(loaded.voice && !loaded.skill){ loaded.skill = loaded.voice; }
+      if(!Array.isArray(loaded.themes)){ loaded.themes = loaded.theme ? [loaded.theme] : ['','','','']; }
+      delete loaded.theme;
+      state = loaded;
+      renderAll(); save();
+      flash('back-up geladen ✓');
+    }catch(e){ flash('ongeldig back-up-bestand'); }
+    restoreInput.value='';
+  };
+  reader.readAsText(f);
+};
+
 let resetArmed=false, resetTimer=null;
 document.getElementById('resetBtn').onclick = ()=>{
   const btn=document.getElementById('resetBtn');
@@ -839,7 +898,7 @@ document.getElementById('resetBtn').onclick = ()=>{
   }
   clearTimeout(resetTimer); resetArmed=false; btn.textContent='Leegmaken';
   state = { pillars:defaultPillars(), skill:'', themes:['','','',''],
-    posts: Array.from({length:9},(_,i)=>({id:'p'+i,pillarId:'',idea:'',caption:'',photo:'',format:''})) };
+    posts: Array.from({length:9},(_,i)=>({id:'p'+i,pillarId:'',idea:'',caption:'',photo:'',format:'',themeIdx:-1})) };
   renderAll(); save();
 };
 
