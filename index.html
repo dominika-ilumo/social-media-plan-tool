@@ -266,7 +266,7 @@
   <p class="hint" style="margin-top:18px;max-width:60ch">Je werk wordt automatisch bewaard in deze browser. Wissel je van toestel of browser? Download een back-up en laad die daar opnieuw.</p>
 
   <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-top:18px;text-align:center">
-    VERSIE 22 · 3 OKT 2026 · THEMA PER POST + BACK-UP
+    VERSIE 24 · 16 NOV 2026 · AI VIA EIGEN WORKER
   </p>
 
 </div>
@@ -494,23 +494,25 @@ function aiErr(e){
   if(m==='leeg') return 'leeg antwoord, opnieuw?';
   return 'AI lukte niet, opnieuw?';
 }
+// De tool praat met je eigen Cloudflare Worker, die de API-sleutel veilig bewaart.
+const AI_WORKER_URL = "https://ai-bug.frosty-morning-f543.workers.dev";
 async function callClaude(sys, usr){
   // 1) ingebouwde Claude (werkt wanneer de tool in de Claude-app/viewer opent)
   try{
     const sample = (window.claude && claude.use) ? await claude.use('sample') : null;
     if(sample){ const r = await sample(sys + '\n\n' + usr); return (r && r.text ? r.text : '').trim(); }
-  }catch(_){ /* val terug op de rechtstreekse methode */ }
-  // 2) rechtstreeks (werkte in oudere gepubliceerde versies; kan nu geblokkeerd zijn)
+  }catch(_){ /* val terug op de Worker */ }
+  // 2) via je eigen Worker (werkt voor iedereen op je eigen gehoste tool)
   let res;
   try{
-    res = await fetch("https://api.anthropic.com/v1/messages",{
+    res = await fetch(AI_WORKER_URL,{
       method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:1000, system: sys, messages:[{role:"user", content: usr}] })
+      body:JSON.stringify({ system: sys, user: usr })
     });
-  }catch(netErr){ throw new Error('unavailable'); }   // geblokkeerd op een publieke pagina
+  }catch(netErr){ throw new Error('unavailable'); }
   if(!res.ok) throw new Error('http-'+res.status);
   const data = await res.json();
-  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+  return (data.text || '').trim();
 }
 
 /* ---------- AI: caption verbeteren / herschrijven ---------- */
@@ -684,7 +686,6 @@ function renderFeed(){
     t.className = 'tile' + ((p||hasPhoto)?'':' empty');
     if(p && !hasPhoto) t.style.background = HEX[p.color];
     let inner = `<span class="tnum">${String(i+1).padStart(2,'0')}</span>`;
-    if(post.format) inner += `<span class="fmt-badge">${post.format[0]}</span>`;
     if(hasPhoto){
       inner += `<img src="${post.photo}" alt=""><div class="scrim"></div>`;
       if(p) inner += `<span class="pbar" style="background:${HEX[p.color]}"></span>`;
