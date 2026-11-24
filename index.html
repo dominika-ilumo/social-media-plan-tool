@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Social media plan tool</title>
+<title>Content Plan Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
     --line:#DCD6C8;
     --accent:#2F4A3C;      /* diep evergreen */
     --accent-soft:#EAF0EB;
+    --gold:#E3B23C;        /* mosterdgeel accent (zoals de promo) */
+    --gold-soft:#F6E7B4;
     /* pillar palet, gedempt editorial */
     --p0:#B77F35; --p1:#B0573F; --p2:#6F8763; --p3:#77577A; --p4:#4F6E80; --p5:#8A7A46;
   }
@@ -35,12 +37,19 @@
     color:var(--accent);margin:0 0 10px;
   }
   h1{
-    font-family:"Fraunces",serif;font-weight:500;
+    font-family:"Fraunces",serif;font-weight:500;color:var(--accent);
     font-size:clamp(34px,6vw,58px);line-height:1.02;margin:0 0 14px;
     letter-spacing:-.01em;
   }
   .lede{font-size:clamp(15px,2.2vw,18px);color:var(--muted);max-width:56ch;margin:0}
-  header.hero{border-bottom:1px solid var(--line);padding-bottom:30px;margin-bottom:8px}
+  header.hero{border-bottom:1px solid var(--line);padding-bottom:30px;margin-bottom:8px;position:relative}
+  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .ai-pill{
+    display:inline-flex;align-items:center;gap:6px;flex:none;
+    background:var(--gold);color:#3a2d08;font-weight:700;font-size:12.5px;
+    letter-spacing:.02em;padding:6px 13px;border-radius:999px;
+  }
+  .lede b{color:var(--ink)}
 
   .step{padding:34px 0;border-bottom:1px solid var(--line)}
   .step-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
@@ -72,6 +81,23 @@
   .ghost-btn:hover{background:var(--accent-soft)}
 
   .voice-wrap{margin-top:20px}
+  .step-title.strong{font-weight:600}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:4px 0 18px}
+  .tab-btn{font:inherit;font-size:14px;color:var(--muted);background:transparent;border:none;border-bottom:2px solid transparent;padding:9px 14px;margin-bottom:-1px;cursor:pointer}
+  .tab-btn:hover{color:var(--ink)}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+  .story-q{margin-bottom:18px}
+  .story-q .lbl{margin-bottom:3px;color:var(--accent)}
+  .qhint{font-size:12.5px;color:var(--muted);margin:0 0 7px;line-height:1.45}
+  textarea.story-field{min-height:62px}
+  .story-paste{margin-top:6px;border-top:1px solid var(--line);padding-top:12px}
+  .story-paste summary{font-size:13.5px;color:var(--accent);cursor:pointer;list-style:none}
+  .story-paste summary::-webkit-details-marker{display:none}
+  .story-paste summary:before{content:"+ ";font-weight:700}
+  .story-paste[open] summary:before{content:"– "}
+  .story-paste textarea{margin-top:10px}
   .theme-wrap{display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:4px}
   .theme-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
   .theme-row .tnr{font-family:"Space Mono",monospace;font-size:12px;color:var(--accent);flex:none;width:20px}
@@ -191,24 +217,74 @@
 <div class="wrap">
 
   <header class="hero">
-    <p class="eyebrow">Eén dag plannen · de hele maand rust</p>
-    <h1>Social media plan tool</h1>
-    <p class="lede">Een hulpmiddel om elke maand strategisch geplande content te publiceren, zonder de dagelijkse twijfel en stress. Je verschuift van elke-dag-content-stress naar één dag shooten en één dag alles voorbereiden en inplannen. Daarna staat je hele maand klaar.</p>
+    <div class="hero-top">
+      <p class="eyebrow" style="margin-bottom:0">Eén dag plannen · de hele maand rust</p>
+      <span class="ai-pill">✦ inclusief AI</span>
+    </div>
+    <h1 style="margin-top:14px">Content Plan Tool</h1>
+    <p class="lede">Plan je social media voor een hele maand <b>in één middag</b>. Strategisch geplande content, zonder de dagelijkse twijfel en stress: van elke-dag-content-stress naar één dag shooten en één dag alles voorbereiden en inplannen.</p>
   </header>
 
   <!-- STAP 1 -->
   <section class="step">
-    <div class="step-head"><span class="step-num">01</span><h2 class="step-title">Jouw vaste basis</h2></div>
-    <p class="step-sub">Dit vul je één keer in en het blijft elke maand staan. Heb je al een skill of merkgids? Plak die gerust. Zo niet, beschrijf jezelf gewoon hieronder. Op deze basis schrijft de AI captions die als jou klinken.</p>
+    <div class="step-head"><span class="step-num">01</span><h2 class="step-title strong">Jouw verhaal</h2></div>
+    <p class="step-sub">Dit is de basis waarop de AI schrijft. Hoe duidelijker je verhaal, hoe meer de captions als jóu klinken. Vul een korte samenvatting in, of laat je begeleiden met vragen via het tabblad ‘Strategie bepalen’.</p>
 
-    <label class="lbl">Content categorieën</label>
-    <div class="pillars" id="pillars"></div>
-    <button class="ghost-btn" id="addPillar">+ categorie</button>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-summary" type="button">Samenvatting</button>
+      <button class="tab-btn" data-tab="tab-strategy" type="button">Strategie bepalen</button>
+    </div>
 
-    <div class="voice-wrap">
-      <label class="lbl" for="skill">Jouw verhaal</label>
-      <textarea id="skill" placeholder="Beschrijf wie je bent, voor wie je schrijft (doelgroep), je tone of voice, je aanbod, en wat je NIET wil horen. Dit wordt je vaste basis voor elke maand."></textarea>
-      <p class="hint">Alles wat je hier schrijft, wordt bij élke caption automatisch meegegeven, dus je hoeft je context nooit meer opnieuw uit te leggen.</p>
+    <div id="tab-summary" class="tab-panel active">
+      <textarea id="skill-summary" style="min-height:120px" placeholder="Ik ben (naam) van (merk). Ik maak/help (wat / voor wie). Ik klink (toon), ik bied (aanbod) aan, en ik wil liever geen (wat je niet wil horen)."></textarea>
+      <p class="hint">Dit korte verhaal gaat bij élke caption automatisch mee. Je kan het hier altijd snel aanpassen. Nog geen idee wat te schrijven? Ga naar ‘Strategie bepalen’ en laat je begeleiden met vragen.</p>
+    </div>
+
+    <div id="tab-strategy" class="tab-panel">
+      <p class="hint" style="margin-top:0;margin-bottom:16px">Beantwoord deze vragen in je eigen woorden. Als je klaar bent, klik je onderaan op de knop en zetten we je antwoorden netjes in je samenvatting.</p>
+
+      <div class="story-q">
+        <label class="lbl" for="s-who">Wie ben je en wat doe je?</label>
+        <p class="qhint">Je naam of merk, wat je aanbiedt, en wat je anders maakt dan de rest.</p>
+        <textarea id="s-who" class="story-field" placeholder="Ik ben (naam) van (merk). Ik maak / help (wat? / wie?)…"></textarea>
+      </div>
+
+      <div class="story-q">
+        <label class="lbl" for="s-audience">Voor wie schrijf je? (je ideale klant)</label>
+        <p class="qhint">Wie wil je bereiken? Wat houdt hen bezig, waar liggen ze van wakker?</p>
+        <textarea id="s-audience" class="story-field" placeholder="Ik schrijf voor (wie?), die (wat willen ze / waar zitten ze mee?)…"></textarea>
+      </div>
+
+      <div class="story-q">
+        <label class="lbl" for="s-tone">Hoe klink je? (je tone of voice)</label>
+        <p class="qhint">Warm of zakelijk? Speels of rustig? Tutoyeer je? Schrijf eventueel een zin die typisch klinkt als jij.</p>
+        <textarea id="s-tone" class="story-field" placeholder="Ik klink (bv. warm / zakelijk / speels / rustig). Ik (tutoyeer / vouvoyeer) en…"></textarea>
+      </div>
+
+      <div class="story-q">
+        <label class="lbl" for="s-offer">Wat bied je aan?</label>
+        <p class="qhint">Je diensten of producten, en waar je mensen naartoe wil (een boeking, een gesprek, je nieuwsbrief...).</p>
+        <textarea id="s-offer" class="story-field" placeholder="Ik bied (wat?) aan. Ik wil dat mensen (welke stap zetten?)…"></textarea>
+      </div>
+
+      <div class="story-q">
+        <label class="lbl" for="s-avoid">Wat wil je NIET horen?</label>
+        <p class="qhint">Woorden, clichés of een toon die absoluut niet bij je passen. Zo vermijdt de AI ze.</p>
+        <textarea id="s-avoid" class="story-field" placeholder="Liever geen (welke woorden / clichés / toon?)…"></textarea>
+      </div>
+
+      <details class="story-paste">
+        <summary>Heb je al een skill of merkgids? Plak die hier (optioneel)</summary>
+        <textarea id="skill-extra" class="story-field" placeholder="Plak hier extra context die je al klaar hebt. Dit wordt mee in je samenvatting gezet."></textarea>
+      </details>
+
+      <button class="gen" id="buildSummary" type="button" style="margin-top:14px">Zet mijn antwoorden in de samenvatting</button>
+    </div>
+
+    <div class="voice-wrap" style="margin-top:26px">
+      <label class="lbl">Content categorieën</label>
+      <div class="pillars" id="pillars"></div>
+      <button class="ghost-btn" id="addPillar">+ categorie</button>
     </div>
   </section>
 
@@ -266,7 +342,7 @@
   <p class="hint" style="margin-top:18px;max-width:60ch">Je werk wordt automatisch bewaard in deze browser. Wissel je van toestel of browser? Download een back-up en laad die daar opnieuw.</p>
 
   <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-top:18px;text-align:center">
-    VERSIE 24 · 16 NOV 2026 · AI VIA EIGEN WORKER
+    VERSIE 30 · 24 NOV 2026
   </p>
 
 </div>
@@ -285,10 +361,31 @@ function defaultPillars(){
 }
 let state = {
   pillars: defaultPillars(),
+  story: {who:'',audience:'',tone:'',offer:'',avoid:'',extra:''},
   skill: '',
   themes: ['','','',''],
   posts: Array.from({length:9}, (_,i)=>({id:'p'+i, pillarId:'', idea:'', caption:'', photo:'', format:'', themeIdx:-1})),
 };
+
+/* ---------- 'Jouw verhaal' uit deelvragen samenstellen ---------- */
+function composeStory(st){
+  if(!st) return '';
+  const parts=[];
+  const add=(label,v)=>{ if(v&&v.trim()) parts.push(label+': '+v.trim()); };
+  add('Wie ik ben en wat ik doe', st.who);
+  add('Mijn ideale klant / doelgroep', st.audience);
+  add('Mijn tone of voice', st.tone);
+  add('Mijn aanbod', st.offer);
+  add('Wat ik NIET wil horen', st.avoid);
+  if(st.extra && st.extra.trim()) parts.push(st.extra.trim());
+  return parts.join('\n');
+}
+function ensureStory(st){
+  if(!st.story || typeof st.story!=='object'){
+    st.story={who:'',audience:'',tone:'',offer:'',avoid:'',extra:''};
+  }
+  if(typeof st.skill!=='string'){ st.skill = composeStory(st.story); }  // skill = de bewerkbare samenvatting
+}
 
 /* ---------- persistentie ---------- */
 async function save(){
@@ -308,6 +405,7 @@ async function load(){
       if(loaded.voice && !loaded.skill){ loaded.skill = loaded.voice; }   // migratie oude versie
       if(!Array.isArray(loaded.themes)){ loaded.themes = loaded.theme ? [loaded.theme] : ['','','','']; }  // migratie enkel thema -> lijst
       delete loaded.theme;
+      ensureStory(loaded);   // migratie vrij tekstvak -> deelvragen
       state = loaded;
     }
   }catch(e){}
@@ -432,11 +530,18 @@ function renderBatch(){
       cap.className='cap'; cap.contentEditable=true; cap.textContent=post.caption;
       cap.oninput = ()=>{ post.caption=cap.textContent; debSave(); };
       cell.appendChild(cap);
+      const capBtns = document.createElement('div');
+      capBtns.style.cssText='display:flex;gap:14px;flex-wrap:wrap';
+      const corrBtn = document.createElement('button');
+      corrBtn.className='photo-btn';
+      corrBtn.textContent='fouten verbeteren';
+      corrBtn.onclick = ()=>correctCaption(post, corrBtn);
       const fixBtn = document.createElement('button');
-      fixBtn.className='photo-btn'; fixBtn.style.alignSelf='flex-start';
-      fixBtn.textContent='verbeter tekst';
+      fixBtn.className='photo-btn';
+      fixBtn.textContent='herschrijf vlotter';
       fixBtn.onclick = ()=>improveCaption(post, fixBtn);
-      cell.appendChild(fixBtn);
+      capBtns.appendChild(corrBtn); capBtns.appendChild(fixBtn);
+      cell.appendChild(capBtns);
     }
 
     const actions = document.createElement('div'); actions.className='row-actions';
@@ -516,9 +621,27 @@ async function callClaude(sys, usr){
 }
 
 /* ---------- AI: caption verbeteren / herschrijven ---------- */
+/* ---------- AI: enkel fouten verbeteren (woorden ongemoeid) ---------- */
+async function correctCaption(post, btn){
+  if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, 'nog geen caption'); return; }
+  const orig = btn.textContent; btn.disabled=true; btn.textContent='corrigeert…';
+  const sys = `Je bent een taalcorrector voor Belgisch Nederlands. Verbeter ALLEEN de fouten: spelling, dt-fouten, grammatica, leestekens en hoofdletters. Verander NIETS aan de woordkeuze, de zinsbouw, de toon of de lengte. Herschrijf niet en voeg niets toe; je raakt alleen aan wat fout is.
+Behoud de opmaak exact, inclusief alinea's en lege regels. Gebruik nooit een gedachtestreepje (— of –).
+Antwoord met ALLEEN de verbeterde tekst, zonder uitleg of aanhalingstekens.`;
+  const usr = `Verbeter de fouten in deze tekst, laat de rest ongemoeid:\n${post.caption.trim()}`;
+  try{
+    let text = stripDashes(await callClaude(sys, usr));
+    if(text){ post.caption = text; renderBatch(); renderFeed(); debSave(); }
+    else throw new Error('leeg');
+  }catch(e){
+    btnMsg(btn, orig, aiErr(e));
+  }
+}
+
+/* ---------- AI: herschrijven, vlotter maken ---------- */
 async function improveCaption(post, btn){
   if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, 'nog geen caption'); return; }
-  const orig = btn.textContent; btn.disabled=true; btn.textContent='verbetert…';
+  const orig = btn.textContent; btn.disabled=true; btn.textContent='herschrijft…';
   const sys = `Je bent corrector en copywriter in vlot Belgisch Nederlands. Verbeter de aangeleverde caption: haal spel-, grammatica- en dt-fouten eruit, maak de zinnen vlotter en natuurlijker, maar behoud de boodschap, de toon en ongeveer de lengte. Verzin geen nieuwe inhoud.
 Behoud of verbeter de opmaak: korte alinea's met een lege regel ertussen en een CTA op een eigen regel. Lever nooit één blok tekst.
 Gebruik nooit een gedachtestreepje (— of –); gebruik een komma, punt of haakjes.
@@ -774,8 +897,30 @@ function renderBalance(){
 }
 
 /* ---------- voice ---------- */
-const skillEl = document.getElementById('skill');
-skillEl.oninput = ()=>{ state.skill=skillEl.value; debSave(); };
+const STORY_FIELDS = {who:'s-who', audience:'s-audience', tone:'s-tone', offer:'s-offer', avoid:'s-avoid', extra:'skill-extra'};
+const storyEls = {};
+Object.keys(STORY_FIELDS).forEach(key=>{
+  const el = document.getElementById(STORY_FIELDS[key]);
+  storyEls[key] = el;
+  el.oninput = ()=>{ if(!state.story) ensureStory(state); state.story[key]=el.value; debSave(); };
+});
+// bewerkbare samenvatting (wat echt naar de AI gaat)
+const summaryEl = document.getElementById('skill-summary');
+summaryEl.oninput = ()=>{ state.skill=summaryEl.value; debSave(); };
+// antwoorden omzetten naar de samenvatting
+document.getElementById('buildSummary').onclick = ()=>{
+  const txt = composeStory(state.story);
+  if(!txt){ flash('vul eerst enkele vragen in'); return; }
+  state.skill = txt; summaryEl.value = txt; debSave();
+  switchStoryTab('tab-summary');
+  flash('samenvatting bijgewerkt ✓');
+};
+// tabbladen
+function switchStoryTab(id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.id===id));
+}
+document.querySelectorAll('.tab-btn').forEach(b=>{ b.onclick=()=>switchStoryTab(b.dataset.tab); });
 function renderThemes(){
   const el = document.getElementById('themes'); el.innerHTML='';
   state.themes.forEach((t,i)=>{
@@ -880,6 +1025,7 @@ restoreInput.onchange = ()=>{
       if(loaded.voice && !loaded.skill){ loaded.skill = loaded.voice; }
       if(!Array.isArray(loaded.themes)){ loaded.themes = loaded.theme ? [loaded.theme] : ['','','','']; }
       delete loaded.theme;
+      ensureStory(loaded);
       state = loaded;
       renderAll(); save();
       flash('back-up geladen ✓');
@@ -898,7 +1044,7 @@ document.getElementById('resetBtn').onclick = ()=>{
     return;
   }
   clearTimeout(resetTimer); resetArmed=false; btn.textContent='Leegmaken';
-  state = { pillars:defaultPillars(), skill:'', themes:['','','',''],
+  state = { pillars:defaultPillars(), story:{who:'',audience:'',tone:'',offer:'',avoid:'',extra:''}, skill:'', themes:['','','',''],
     posts: Array.from({length:9},(_,i)=>({id:'p'+i,pillarId:'',idea:'',caption:'',photo:'',format:'',themeIdx:-1})) };
   renderAll(); save();
 };
@@ -916,7 +1062,9 @@ function stripDashes(s){
     .trim();
 }
 function renderAll(){
-  skillEl.value = state.skill||'';
+  if(!state.story) ensureStory(state);
+  Object.keys(STORY_FIELDS).forEach(key=>{ if(storyEls[key]) storyEls[key].value = (state.story && state.story[key]) || ''; });
+  if(summaryEl) summaryEl.value = state.skill || '';
   renderThemes();
   renderPillars(); renderBatch(); renderFeed(); renderBalance();
 }
