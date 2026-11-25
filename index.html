@@ -44,6 +44,22 @@
   .lede{font-size:clamp(15px,2.2vw,18px);color:var(--muted);max-width:56ch;margin:0}
   header.hero{border-bottom:1px solid var(--line);padding-bottom:30px;margin-bottom:8px;position:relative}
   .hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .lang-switch{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lang-btn{font:inherit;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);background:transparent;border:none;padding:5px 11px;cursor:pointer}
+  .lang-btn.active{background:var(--accent);color:#fff}
+  .help-btn{width:30px;height:30px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--accent);font-weight:800;font-size:15px;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .help-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .help-overlay{position:fixed;inset:0;background:rgba(20,30,25,.55);display:none;align-items:flex-start;justify-content:center;padding:28px 16px;z-index:1000;overflow-y:auto}
+  .help-overlay.open{display:flex}
+  .help-card{background:#fff;max-width:620px;width:100%;border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.25);overflow:hidden}
+  .help-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px;background:var(--accent);color:#fff}
+  .help-head h3{margin:0;font-size:18px;font-weight:800}
+  .help-close{width:30px;height:30px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;font-size:18px;cursor:pointer;line-height:1;flex:none}
+  .help-close:hover{background:rgba(255,255,255,.18)}
+  .help-body{padding:20px 24px 26px;max-height:72vh;overflow-y:auto}
+  .help-body .faq-q{margin:18px 0 4px;font-size:14.5px;font-weight:800;color:var(--accent)}
+  .help-body .faq-q:first-child{margin-top:0}
+  .help-body .faq-a{margin:0;font-size:14px;line-height:1.55;color:var(--ink)}
   .ai-pill{
     display:inline-flex;align-items:center;gap:6px;flex:none;
     background:var(--gold);color:#3a2d08;font-weight:700;font-size:12.5px;
@@ -92,6 +108,8 @@
   .story-q .lbl{margin-bottom:3px;color:var(--accent)}
   .qhint{font-size:12.5px;color:var(--muted);margin:0 0 7px;line-height:1.45}
   textarea.story-field{min-height:62px}
+  input.story-field{background:var(--card);border:1px solid var(--line);border-radius:12px;font:inherit;color:var(--ink);padding:12px 14px}
+  input.story-field:focus{outline:none;border-color:var(--accent)}
   .story-paste{margin-top:6px;border-top:1px solid var(--line);padding-top:12px}
   .story-paste summary{font-size:13.5px;color:var(--accent);cursor:pointer;list-style:none}
   .story-paste summary::-webkit-details-marker{display:none}
@@ -218,108 +236,142 @@
 
   <header class="hero">
     <div class="hero-top">
-      <p class="eyebrow" style="margin-bottom:0">Eén dag plannen · de hele maand rust</p>
-      <span class="ai-pill">✦ inclusief AI</span>
+      <p class="eyebrow" style="margin-bottom:0" data-i18n="eyebrow">Eén dag plannen · de hele maand rust</p>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="lang-switch">
+          <button type="button" class="lang-btn active" data-lang="nl">NL</button>
+          <button type="button" class="lang-btn" data-lang="pl">PL</button>
+        </div>
+        <span class="ai-pill" data-i18n="aipill">✦ inclusief AI</span>
+        <button type="button" class="help-btn" id="helpBtn" aria-label="Help">?</button>
+      </div>
     </div>
     <h1 style="margin-top:14px">Content Plan Tool</h1>
-    <p class="lede">Plan je social media voor een hele maand <b>in één middag</b>. Strategisch geplande content, zonder de dagelijkse twijfel en stress: van elke-dag-content-stress naar één dag shooten en één dag alles voorbereiden en inplannen.</p>
+    <p class="lede" data-i18n-html="lede">Plan je social media voor een hele maand <b>in één middag</b>. Strategisch geplande content, zonder de dagelijkse twijfel en stress: van elke-dag-content-stress naar één dag shooten en één dag alles voorbereiden en inplannen.</p>
   </header>
+
+  <!-- HULP / POMOC -->
+  <div class="help-overlay" id="helpOverlay">
+    <div class="help-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="help-head">
+        <h3 id="helpTitle" data-i18n="helpTitle">Hulp &amp; veelgestelde vragen</h3>
+        <button type="button" class="help-close" id="helpClose" aria-label="Sluiten">×</button>
+      </div>
+      <div class="help-body" id="helpBody"></div>
+    </div>
+  </div>
 
   <!-- STAP 1 -->
   <section class="step">
-    <div class="step-head"><span class="step-num">01</span><h2 class="step-title strong">Jouw verhaal</h2></div>
-    <p class="step-sub">Dit is de basis waarop de AI schrijft. Hoe duidelijker je verhaal, hoe meer de captions als jóu klinken. Vul een korte samenvatting in, of laat je begeleiden met vragen via het tabblad ‘Strategie bepalen’.</p>
+    <div class="step-head"><span class="step-num">01</span><h2 class="step-title strong" data-i18n="s1title">Jouw verhaal</h2></div>
+    <p class="step-sub" data-i18n="s1sub">Dit is de basis waarop de AI schrijft. Hoe duidelijker je verhaal, hoe meer de captions als jóu klinken. Vul een korte samenvatting in, of laat je begeleiden met vragen via het tabblad ‘Strategie bepalen’.</p>
 
     <div class="tabs" role="tablist">
-      <button class="tab-btn active" data-tab="tab-summary" type="button">Samenvatting</button>
-      <button class="tab-btn" data-tab="tab-strategy" type="button">Strategie bepalen</button>
+      <button class="tab-btn active" data-tab="tab-summary" type="button" data-i18n="tabSummary">Samenvatting</button>
+      <button class="tab-btn" data-tab="tab-strategy" type="button" data-i18n="tabStrategy">Strategie bepalen</button>
+      <button class="tab-btn" data-tab="tab-story" type="button" data-i18n="tabStory">Storytelling</button>
     </div>
 
     <div id="tab-summary" class="tab-panel active">
-      <textarea id="skill-summary" style="min-height:120px" placeholder="Ik ben (naam) van (merk). Ik maak/help (wat / voor wie). Ik klink (toon), ik bied (aanbod) aan, en ik wil liever geen (wat je niet wil horen)."></textarea>
-      <p class="hint">Dit korte verhaal gaat bij élke caption automatisch mee. Je kan het hier altijd snel aanpassen. Nog geen idee wat te schrijven? Ga naar ‘Strategie bepalen’ en laat je begeleiden met vragen.</p>
+      <textarea id="skill-summary" style="min-height:120px" data-i18n-ph="summaryPh" placeholder="Ik ben (naam) van (merk). Ik maak/help (wat / voor wie). Ik klink (toon), ik bied (aanbod) aan, en ik wil liever geen (wat je niet wil horen)."></textarea>
+      <p class="hint" data-i18n="summaryHint">Dit korte verhaal gaat bij élke caption automatisch mee. Je kan het hier altijd snel aanpassen. Nog geen idee wat te schrijven? Ga naar ‘Strategie bepalen’ en laat je begeleiden met vragen.</p>
     </div>
 
     <div id="tab-strategy" class="tab-panel">
-      <p class="hint" style="margin-top:0;margin-bottom:16px">Beantwoord deze vragen in je eigen woorden. Als je klaar bent, klik je onderaan op de knop en zetten we je antwoorden netjes in je samenvatting.</p>
+      <p class="hint" style="margin-top:0;margin-bottom:16px" data-i18n="strategyIntro">Beantwoord deze vragen in je eigen woorden. Als je klaar bent, klik je onderaan op de knop en zetten we je antwoorden netjes in je samenvatting.</p>
 
       <div class="story-q">
-        <label class="lbl" for="s-who">Wie ben je en wat doe je?</label>
-        <p class="qhint">Je naam of merk, wat je aanbiedt, en wat je anders maakt dan de rest.</p>
-        <textarea id="s-who" class="story-field" placeholder="Ik ben (naam) van (merk). Ik maak / help (wat? / wie?)…"></textarea>
+        <label class="lbl" for="s-who" data-i18n="qWhoL">Wie ben je en wat doe je?</label>
+        <p class="qhint" data-i18n="qWhoH">Je naam of merk, wat je aanbiedt, en wat je anders maakt dan de rest.</p>
+        <textarea id="s-who" class="story-field" data-i18n-ph="qWhoP" placeholder="Ik ben (naam) van (merk). Ik maak / help (wat? / wie?)…"></textarea>
       </div>
 
       <div class="story-q">
-        <label class="lbl" for="s-audience">Voor wie schrijf je? (je ideale klant)</label>
-        <p class="qhint">Wie wil je bereiken? Wat houdt hen bezig, waar liggen ze van wakker?</p>
-        <textarea id="s-audience" class="story-field" placeholder="Ik schrijf voor (wie?), die (wat willen ze / waar zitten ze mee?)…"></textarea>
+        <label class="lbl" for="s-audience" data-i18n="qAudL">Voor wie schrijf je? (je ideale klant)</label>
+        <p class="qhint" data-i18n="qAudH">Wie wil je bereiken? Wat houdt hen bezig, waar liggen ze van wakker?</p>
+        <textarea id="s-audience" class="story-field" data-i18n-ph="qAudP" placeholder="Ik schrijf voor (wie?), die (wat willen ze / waar zitten ze mee?)…"></textarea>
       </div>
 
       <div class="story-q">
-        <label class="lbl" for="s-tone">Hoe klink je? (je tone of voice)</label>
-        <p class="qhint">Warm of zakelijk? Speels of rustig? Tutoyeer je? Schrijf eventueel een zin die typisch klinkt als jij.</p>
-        <textarea id="s-tone" class="story-field" placeholder="Ik klink (bv. warm / zakelijk / speels / rustig). Ik (tutoyeer / vouvoyeer) en…"></textarea>
+        <label class="lbl" for="s-tone" data-i18n="qToneL">Hoe klink je? (je tone of voice)</label>
+        <p class="qhint" data-i18n="qToneH">Warm of zakelijk? Speels of rustig? Tutoyeer je? Schrijf eventueel een zin die typisch klinkt als jij.</p>
+        <textarea id="s-tone" class="story-field" data-i18n-ph="qToneP" placeholder="Ik klink (bv. warm / zakelijk / speels / rustig). Ik (tutoyeer / vouvoyeer) en…"></textarea>
       </div>
 
       <div class="story-q">
-        <label class="lbl" for="s-offer">Wat bied je aan?</label>
-        <p class="qhint">Je diensten of producten, en waar je mensen naartoe wil (een boeking, een gesprek, je nieuwsbrief...).</p>
-        <textarea id="s-offer" class="story-field" placeholder="Ik bied (wat?) aan. Ik wil dat mensen (welke stap zetten?)…"></textarea>
+        <label class="lbl" for="s-offer" data-i18n="qOfferL">Wat bied je aan?</label>
+        <p class="qhint" data-i18n="qOfferH">Je diensten of producten, en waar je mensen naartoe wil (een boeking, een gesprek, je nieuwsbrief...).</p>
+        <textarea id="s-offer" class="story-field" data-i18n-ph="qOfferP" placeholder="Ik bied (wat?) aan. Ik wil dat mensen (welke stap zetten?)…"></textarea>
       </div>
 
       <div class="story-q">
-        <label class="lbl" for="s-avoid">Wat wil je NIET horen?</label>
-        <p class="qhint">Woorden, clichés of een toon die absoluut niet bij je passen. Zo vermijdt de AI ze.</p>
-        <textarea id="s-avoid" class="story-field" placeholder="Liever geen (welke woorden / clichés / toon?)…"></textarea>
+        <label class="lbl" for="s-avoid" data-i18n="qAvoidL">Wat wil je NIET horen?</label>
+        <p class="qhint" data-i18n="qAvoidH">Woorden, clichés of een toon die absoluut niet bij je passen. Zo vermijdt de AI ze.</p>
+        <textarea id="s-avoid" class="story-field" data-i18n-ph="qAvoidP" placeholder="Liever geen (welke woorden / clichés / toon?)…"></textarea>
       </div>
 
       <details class="story-paste">
-        <summary>Heb je al een skill of merkgids? Plak die hier (optioneel)</summary>
-        <textarea id="skill-extra" class="story-field" placeholder="Plak hier extra context die je al klaar hebt. Dit wordt mee in je samenvatting gezet."></textarea>
+        <summary data-i18n="pasteSum">Heb je al een skill of merkgids? Plak die hier (optioneel)</summary>
+        <textarea id="skill-extra" class="story-field" data-i18n-ph="pasteP" placeholder="Plak hier extra context die je al klaar hebt. Dit wordt mee in je samenvatting gezet."></textarea>
       </details>
 
-      <button class="gen" id="buildSummary" type="button" style="margin-top:14px">Zet mijn antwoorden in de samenvatting</button>
+      <button class="gen" id="buildSummary" type="button" style="margin-top:14px" data-i18n="buildBtn">Zet mijn antwoorden in de samenvatting</button>
+    </div>
+
+    <div id="tab-story" class="tab-panel">
+      <p class="hint" style="margin-top:0;margin-bottom:16px" data-i18n="storyIntro">Plak hier een of meer captions die je zélf eerder schreef en die echt als jou klinken. De AI gebruikt ze als voorbeeld voor je stijl en toon. Dit is optioneel, maar het maakt je captions meteen veel persoonlijker.</p>
+
+      <div class="story-q">
+        <label class="lbl" for="s-examples" data-i18n="exLabel">Voorbeeldcaptions in jouw stem</label>
+        <p class="qhint" data-i18n="exHint">Plak hier 1 tot 3 captions die je zelf schreef. Hoe meer ze als jou klinken, hoe beter.</p>
+        <textarea id="s-examples" class="story-field" style="min-height:120px" data-i18n-ph="exPh" placeholder="Plak hier een of meer van je eigen captions…"></textarea>
+      </div>
+
+      <div class="story-q">
+        <label class="lbl" for="s-instagram" data-i18n="igLabel">Je Instagram (optioneel)</label>
+        <input id="s-instagram" class="story-field" style="width:100%" data-i18n-ph="igPh" placeholder="@jouwnaam of de link naar je profiel">
+      </div>
     </div>
 
     <div class="voice-wrap" style="margin-top:26px">
-      <label class="lbl">Content categorieën</label>
+      <label class="lbl" data-i18n="catLabel">Content categorieën</label>
       <div class="pillars" id="pillars"></div>
-      <button class="ghost-btn" id="addPillar">+ categorie</button>
+      <button class="ghost-btn" id="addPillar" data-i18n="addCat">+ categorie</button>
     </div>
   </section>
 
   <!-- STAP 2: THEMA -->
   <section class="step">
-    <div class="step-head"><span class="step-num">02</span><h2 class="step-title">Thema's van de maand</h2></div>
-    <p class="step-sub">Een paar invalshoeken die als rode draad door je maand lopen. De AI rouleert hier doorheen, zodat je posts afwisselen in plaats van rond één thema te blijven hangen. Vul ze zelf in, of laat de AI een voorstel doen.</p>
+    <div class="step-head"><span class="step-num">02</span><h2 class="step-title" data-i18n="s2title">Thema's van de maand</h2></div>
+    <p class="step-sub" data-i18n="s2sub">Een paar invalshoeken die als rode draad door je maand lopen. De AI rouleert hier doorheen, zodat je posts afwisselen in plaats van rond één thema te blijven hangen. Vul ze zelf in, of laat de AI een voorstel doen.</p>
     <div id="themes"></div>
     <div class="theme-wrap" style="flex-direction:row;flex-wrap:wrap;gap:10px;margin-top:4px">
-      <button class="ghost-btn" id="addTheme">+ thema</button>
-      <button class="gen" id="themeBtn">Laat AI thema's voorstellen</button>
+      <button class="ghost-btn" id="addTheme" data-i18n="addTheme">+ thema</button>
+      <button class="gen" id="themeBtn" data-i18n="themeBtn">Laat AI thema's voorstellen</button>
     </div>
-    <p class="hint">Elke post krijgt om de beurt een van deze thema's mee, zodat je maand afwisselt en toch samenhangt.</p>
+    <p class="hint" data-i18n="s2hint">Elke post krijgt om de beurt een van deze thema's mee, zodat je maand afwisselt en toch samenhangt.</p>
   </section>
 
   <!-- STAP 3 -->
   <section class="step">
-    <div class="step-head"><span class="step-num">03</span><h2 class="step-title">Batch je posts</h2></div>
-    <p class="step-sub">Laat de AI per post een idee én het best passende formaat (reel, post of carrousel) voorstellen. Je mag beide overschrijven. Klik daarna op ‘Schrijf caption’: die houdt meteen rekening met het formaat. Jij bent de eindredacteur, klik in een caption om aan te passen.</p>
+    <div class="step-head"><span class="step-num">03</span><h2 class="step-title" data-i18n="s3title">Batch je posts</h2></div>
+    <p class="step-sub" data-i18n="s3sub">Laat de AI per post een idee én het best passende formaat (reel, post of carrousel) voorstellen. Je mag beide overschrijven. Klik daarna op ‘Schrijf caption’: die houdt meteen rekening met het formaat. Jij bent de eindredacteur, klik in een caption om aan te passen.</p>
     <div class="batch" id="batch"></div>
-    <button class="ghost-btn add-row" id="addRow">+ post</button>
+    <button class="ghost-btn add-row" id="addRow" data-i18n="addRow">+ post</button>
   </section>
 
   <!-- STAP 4 -->
   <section class="step">
-    <div class="step-head"><span class="step-num">04</span><h2 class="step-title">Feed &amp; balans</h2></div>
-    <p class="step-sub">Je feed in 3:4 (het huidige Instagram-formaat), met je eigen foto's erin. Zie je een rode draad, of springt er één categorie te veel uit? Zo controleer je of je strategie zichtbaar is vóór je plant.</p>
+    <div class="step-head"><span class="step-num">04</span><h2 class="step-title" data-i18n="s4title">Feed &amp; balans</h2></div>
+    <p class="step-sub" data-i18n="s4sub">Je feed in 3:4 (het huidige Instagram-formaat), met je eigen foto's erin. Zie je een rode draad, of springt er één categorie te veel uit? Zo controleer je of je strategie zichtbaar is vóór je plant.</p>
     <div class="two-col">
       <div>
-        <label class="lbl">Feed-preview</label>
-        <p class="hint" style="margin-top:-2px;margin-bottom:12px">Zoals op Instagram: je nieuwste post (hoogste nummer) staat linksboven, oudere schuiven naar onder. De nummers blijven je planningsvolgorde. Sleep een tegel om te herschikken; de volledige post (foto, categorie, formaat, idee en caption) schuift mee.</p>
+        <label class="lbl" data-i18n="feedLabel">Feed-preview</label>
+        <p class="hint" style="margin-top:-2px;margin-bottom:12px" data-i18n="feedHint">Zoals op Instagram: je nieuwste post (hoogste nummer) staat linksboven, oudere schuiven naar onder. De nummers blijven je planningsvolgorde. Sleep een tegel om te herschikken; de volledige post (foto, categorie, formaat, idee en caption) schuift mee.</p>
         <div class="feed-grid" id="feed"></div>
       </div>
       <div class="balance">
-        <label class="lbl">Verdeling per categorie</label>
+        <label class="lbl" data-i18n="balLabel">Verdeling per categorie</label>
         <div class="bal-bar" id="balBar"></div>
         <div class="bal-legend" id="balLegend"></div>
       </div>
@@ -328,21 +380,22 @@
 
   <footer class="bar">
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-      <button class="primary" id="tableBtn">Kopieer als tabel</button>
-      <button class="primary" id="csvBtn" style="background:var(--accent)">Download .csv</button>
-      <button class="link-btn" id="copyBtn">Kopieer als tekst</button>
-      <button class="link-btn" id="backupBtn">Back-up downloaden</button>
-      <button class="link-btn" id="restoreBtn">Back-up laden</button>
-      <button class="link-btn" id="resetBtn">Leegmaken</button>
+      <button class="primary" id="tableBtn" data-i18n="btnTable">Kopieer als tabel</button>
+      <button class="primary" id="csvBtn" style="background:var(--accent)" data-i18n="btnCsv">Download .csv</button>
+      <button class="link-btn" id="copyBtn" data-i18n="btnCopy">Kopieer als tekst</button>
+      <button class="link-btn" id="backupBtn" data-i18n="btnBackup">Back-up downloaden</button>
+      <button class="link-btn" id="restoreBtn" data-i18n="btnRestore">Back-up laden</button>
+      <button class="link-btn" id="resetBtn" data-i18n="btnReset">Leegmaken</button>
+      <button class="link-btn" id="logoutBtn" data-i18n="btnLogout" style="margin-left:auto">Afmelden</button>
       <input type="file" id="restoreInput" accept="application/json,.json" style="display:none">
     </div>
     <span class="saved" id="savedTag"></span>
   </footer>
 
-  <p class="hint" style="margin-top:18px;max-width:60ch">Je werk wordt automatisch bewaard in deze browser. Wissel je van toestel of browser? Download een back-up en laad die daar opnieuw.</p>
+  <p class="hint" style="margin-top:18px;max-width:60ch" data-i18n="autosave">Je werk wordt automatisch bewaard in deze browser. Wissel je van toestel of browser? Download een back-up en laad die daar opnieuw.</p>
 
   <p style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);margin-top:18px;text-align:center">
-    VERSIE 30 · 24 NOV 2026
+    VERSIE 35 · 25 NOV 2026
   </p>
 
 </div>
@@ -351,17 +404,169 @@
 const COLORS = ['var(--p0)','var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)'];
 const HEX = {'var(--p0)':'#B77F35','var(--p1)':'#B0573F','var(--p2)':'#6F8763','var(--p3)':'#77577A','var(--p4)':'#4F6E80','var(--p5)':'#8A7A46'};
 
+/* ================= TAAL (NL / PL) ================= */
+let lang = 'nl';
+try{ const sl = localStorage.getItem('smplan:lang'); if(sl==='nl'||sl==='pl') lang = sl; }catch(e){}
+const T = {
+  nl: {
+    eyebrow:"Eén dag plannen · de hele maand rust", aipill:"✦ inclusief AI",
+    lede:"Plan je social media voor een hele maand <b>in één middag</b>. Strategisch geplande content, zonder de dagelijkse twijfel en stress: van elke-dag-content-stress naar één dag shooten en één dag alles voorbereiden en inplannen.",
+    s1title:"Jouw verhaal",
+    s1sub:"Dit is de basis waarop de AI schrijft. Hoe duidelijker je verhaal, hoe meer de captions als jóu klinken. Vul een korte samenvatting in, of laat je begeleiden met vragen via het tabblad ‘Strategie bepalen’.",
+    tabSummary:"Samenvatting", tabStrategy:"Strategie bepalen",
+    summaryPh:"Ik ben (naam) van (merk). Ik maak/help (wat / voor wie). Ik klink (toon), ik bied (aanbod) aan, en ik wil liever geen (wat je niet wil horen).",
+    summaryHint:"Dit korte verhaal gaat bij élke caption automatisch mee. Je kan het hier altijd snel aanpassen. Nog geen idee wat te schrijven? Ga naar ‘Strategie bepalen’ en laat je begeleiden met vragen.",
+    strategyIntro:"Beantwoord deze vragen in je eigen woorden. Als je klaar bent, klik je onderaan op de knop en zetten we je antwoorden netjes in je samenvatting.",
+    qWhoL:"Wie ben je en wat doe je?", qWhoH:"Je naam of merk, wat je aanbiedt, en wat je anders maakt dan de rest.", qWhoP:"Ik ben (naam) van (merk). Ik maak / help (wat? / wie?)…",
+    qAudL:"Voor wie schrijf je? (je ideale klant)", qAudH:"Wie wil je bereiken? Wat houdt hen bezig, waar liggen ze van wakker?", qAudP:"Ik schrijf voor (wie?), die (wat willen ze / waar zitten ze mee?)…",
+    qToneL:"Hoe klink je? (je tone of voice)", qToneH:"Warm of zakelijk? Speels of rustig? Tutoyeer je? Schrijf eventueel een zin die typisch klinkt als jij.", qToneP:"Ik klink (bv. warm / zakelijk / speels / rustig). Ik (tutoyeer / vouvoyeer) en…",
+    qOfferL:"Wat bied je aan?", qOfferH:"Je diensten of producten, en waar je mensen naartoe wil (een boeking, een gesprek, je nieuwsbrief...).", qOfferP:"Ik bied (wat?) aan. Ik wil dat mensen (welke stap zetten?)…",
+    qAvoidL:"Wat wil je NIET horen?", qAvoidH:"Woorden, clichés of een toon die absoluut niet bij je passen. Zo vermijdt de AI ze.", qAvoidP:"Liever geen (welke woorden / clichés / toon?)…",
+    pasteSum:"Heb je al een skill of merkgids? Plak die hier (optioneel)", pasteP:"Plak hier extra context die je al klaar hebt. Dit wordt mee in je samenvatting gezet.",
+    buildBtn:"Zet mijn antwoorden in de samenvatting",
+    tabStory:"Storytelling",
+    storyIntro:"Plak hier een of meer captions die je zélf eerder schreef en die echt als jou klinken. De AI gebruikt ze als voorbeeld voor je stijl en toon. Dit is optioneel, maar het maakt je captions meteen veel persoonlijker.",
+    exLabel:"Voorbeeldcaptions in jouw stem", exHint:"Plak hier 1 tot 3 captions die je zelf schreef. Hoe meer ze als jou klinken, hoe beter.", exPh:"Plak hier een of meer van je eigen captions…",
+    igLabel:"Je Instagram (optioneel)", igPh:"@jouwnaam of de link naar je profiel",
+    catLabel:"Content categorieën", addCat:"+ categorie",
+    s2title:"Thema's van de maand", s2sub:"Een paar invalshoeken die als rode draad door je maand lopen. De AI rouleert hier doorheen, zodat je posts afwisselen in plaats van rond één thema te blijven hangen. Vul ze zelf in, of laat de AI een voorstel doen.",
+    addTheme:"+ thema", themeBtn:"Laat AI thema's voorstellen", s2hint:"Elke post krijgt om de beurt een van deze thema's mee, zodat je maand afwisselt en toch samenhangt.",
+    s3title:"Batch je posts", s3sub:"Laat de AI per post een idee én het best passende formaat (reel, post of carrousel) voorstellen. Je mag beide overschrijven. Klik daarna op ‘Schrijf caption’: die houdt meteen rekening met het formaat. Jij bent de eindredacteur, klik in een caption om aan te passen.", addRow:"+ post",
+    s4title:"Feed & balans", s4sub:"Je feed in 3:4 (het huidige Instagram-formaat), met je eigen foto's erin. Zie je een rode draad, of springt er één categorie te veel uit? Zo controleer je of je strategie zichtbaar is vóór je plant.",
+    feedLabel:"Feed-preview", feedHint:"Zoals op Instagram: je nieuwste post (hoogste nummer) staat linksboven, oudere schuiven naar onder. De nummers blijven je planningsvolgorde. Sleep een tegel om te herschikken; de volledige post (foto, categorie, formaat, idee en caption) schuift mee.", balLabel:"Verdeling per categorie",
+    btnTable:"Kopieer als tabel", btnCsv:"Download .csv", btnCopy:"Kopieer als tekst", btnBackup:"Back-up downloaden", btnRestore:"Back-up laden", btnReset:"Leegmaken", btnLogout:"Afmelden",
+    helpTitle:"Hulp & veelgestelde vragen",
+    autosave:"Je werk wordt automatisch bewaard in deze browser. Wissel je van toestel of browser? Download een back-up en laad die daar opnieuw.",
+    delPillar:"Verwijder categorie", newPillar:"Nieuwe categorie", fmtPh:"formaat…", choosePillar:"kies een categorie",
+    ideaPh:"Waar gaat deze post over? (één regel)", ideaNew:"stel idee voor", ideaOther:"ander idee",
+    corrBtn:"fouten verbeteren", fixBtn:"herschrijf vlotter", genNew:"Schrijf caption", genRe:"Herschrijf",
+    photoAdd:"+ foto", photoChange:"foto wijzigen", del:"verwijder", themeAuto:"thema: auto", dragTitle:"Sleep om te herschikken",
+    feedEmpty:"leeg", balNone:"Nog geen posts aan een categorie toegewezen.", themePh:"Thema %n (bv. City shoot in oktober promoten)", delTheme:"Verwijder thema",
+    resetArm:"klik nog eens om te wissen",
+    bNoIdea:"vul eerst een idee in", bStep12:"vul eerst stap 1 of 2 in", bStory1:"vul eerst je verhaal in (stap 1)",
+    bThinks:"denkt na…", bCorr:"corrigeert…", bFix:"herschrijft…", bWrite:"schrijft…", bNoCap:"nog geen caption",
+    fSaved:"bewaard ✓", fBuildFirst:"vul eerst enkele vragen in", fSummaryUpd:"samenvatting bijgewerkt ✓",
+    fCopied:"gekopieerd ✓", fCopyFail:"kopiëren lukte niet", fTable:"tabel gekopieerd ✓ · plak in Sheets of Excel",
+    fCsv:"csv gedownload ✓", fDownFailTable:"download lukte niet · gebruik Kopieer als tabel", fBackup:"back-up gedownload ✓", fDownFail:"download lukte niet", fBackupLoad:"back-up geladen ✓", fBackupBad:"ongeldig back-up-bestand",
+    eUnavail:"AI werkt in de Claude-app", eHttp:"AI: fout ", eEmpty:"leeg antwoord, opnieuw?", eFail:"AI lukte niet, opnieuw?",
+    xThemes:"Thema's van de maand:", xCats:"Categorieën:", xStory:"Jouw verhaal / basis:", xEmpty:"(leeg)", xPosts:"Posts:", xNoCat:"geen categorie", xIdea:"Idee: ", xCaption:"Caption:",
+    thNr:"Nr", thCat:"Categorie", thFmt:"Format", thIdea:"Idee", thCap:"Caption", thPhoto:"Foto", thDate:"Datum", thChan:"Kanaal", yes:"ja",
+    fmtLabels:{'Reel':'Reel','Post':'Post','Carrousel':'Carrousel','Talking head video':'Talking head video'}
+  },
+  pl: {
+    eyebrow:"Jeden dzień planowania · spokój na cały miesiąc", aipill:"✦ z AI",
+    lede:"Zaplanuj swoje social media na cały miesiąc <b>w jedno popołudnie</b>. Strategicznie zaplanowane treści, bez codziennych wątpliwości i stresu: zamiast codziennego stresu o treści, jeden dzień na zdjęcia i jeden dzień na przygotowanie i zaplanowanie wszystkiego.",
+    s1title:"Twoja historia",
+    s1sub:"To jest baza, na której pisze AI. Im jaśniejsza Twoja historia, tym bardziej podpisy brzmią jak Ty. Wpisz krótkie podsumowanie albo daj się poprowadzić pytaniami w zakładce ‘Ustal strategię’.",
+    tabSummary:"Podsumowanie", tabStrategy:"Ustal strategię",
+    summaryPh:"Jestem (imię) z (marka). Robię/pomagam (co / komu). Brzmię (ton), oferuję (oferta) i wolę unikać (czego nie chcesz słyszeć).",
+    summaryHint:"To krótkie podsumowanie idzie automatycznie przy każdym caption. Możesz je tu zawsze szybko zmienić. Nie wiesz, co napisać? Przejdź do ‘Ustal strategię’ i daj się poprowadzić pytaniami.",
+    strategyIntro:"Odpowiedz na te pytania własnymi słowami. Gdy skończysz, kliknij przycisk na dole, a my ładnie przeniesiemy Twoje odpowiedzi do podsumowania.",
+    qWhoL:"Kim jesteś i czym się zajmujesz?", qWhoH:"Twoje imię lub marka, co oferujesz i co Cię wyróżnia.", qWhoP:"Jestem (imię) z (marka). Robię / pomagam (co? / komu?)…",
+    qAudL:"Dla kogo piszesz? (Twój idealny klient)", qAudH:"Kogo chcesz dotrzeć? Co ich zajmuje, co nie daje im spać?", qAudP:"Piszę dla (kto?), którzy (czego chcą / z czym się zmagają?)…",
+    qToneL:"Jak brzmisz? (ton wypowiedzi)", qToneH:"Ciepło czy rzeczowo? Z luzem czy spokojnie? Na „ty”? Napisz ewentualnie zdanie typowe dla Ciebie.", qToneP:"Brzmię (np. ciepło / rzeczowo / z luzem / spokojnie). Zwracam się (na ty / na pan) i…",
+    qOfferL:"Co oferujesz?", qOfferH:"Twoje usługi lub produkty i dokąd chcesz skierować ludzi (rezerwacja, rozmowa, newsletter...).", qOfferP:"Oferuję (co?). Chcę, żeby ludzie (jaki krok zrobili?)…",
+    qAvoidL:"Czego NIE chcesz słyszeć?", qAvoidH:"Słowa, klisze lub ton, które zupełnie do Ciebie nie pasują. Dzięki temu AI ich unika.", qAvoidP:"Wolę bez (jakich słów / klisz / tonu?)…",
+    pasteSum:"Masz już skill lub brandbook? Wklej go tutaj (opcjonalnie)", pasteP:"Wklej tutaj dodatkowy kontekst, który już masz. Zostanie dołączony do Twojego podsumowania.",
+    buildBtn:"Przenieś moje odpowiedzi do podsumowania",
+    tabStory:"Storytelling",
+    storyIntro:"Wklej tu jeden lub kilka captions, które sam(a) wcześniej napisałeś/aś i które naprawdę brzmią jak Ty. AI użyje ich jako wzoru stylu i tonu. To opcjonalne, ale od razu sprawia, że Twoje captions są dużo bardziej osobiste.",
+    exLabel:"Przykładowe captions w Twoim stylu", exHint:"Wklej tu 1 do 3 captions, które sam(a) napisałeś/aś. Im bardziej brzmią jak Ty, tym lepiej.", exPh:"Wklej tu jeden lub kilka własnych captions…",
+    igLabel:"Twój Instagram (opcjonalnie)", igPh:"@twojanazwa lub link do profilu",
+    catLabel:"Kategorie treści", addCat:"+ kategoria",
+    s2title:"Tematy miesiąca", s2sub:"Kilka motywów przewodnich na cały miesiąc. AI rotuje między nimi, dzięki czemu posty są różnorodne, zamiast kręcić się wokół jednego tematu. Wpisz je sam(a) albo poproś AI o propozycję.",
+    addTheme:"+ temat", themeBtn:"Poproś AI o tematy", s2hint:"Każdy post dostaje po kolei jeden z tych tematów, dzięki czemu miesiąc jest różnorodny, a mimo to spójny.",
+    s3title:"Przygotuj posty", s3sub:"Poproś AI, by dla każdego posta zaproponowała pomysł i najlepszy format (rolka, post lub karuzela). Oba możesz nadpisać. Potem kliknij ‘Napisz caption’: od razu uwzględni format. Ty jesteś redaktorem, kliknij w caption, aby go zmienić.", addRow:"+ post",
+    s4title:"Feed i balans", s4sub:"Twój feed w 3:4 (obecny format Instagrama), z Twoimi zdjęciami. Widzisz motyw przewodni, czy jedna kategoria za bardzo się wybija? Tak sprawdzisz, czy Twoja strategia jest widoczna, zanim zaplanujesz.",
+    feedLabel:"Podgląd feedu", feedHint:"Jak na Instagramie: najnowszy post (najwyższy numer) jest u góry po lewej, starsze przesuwają się w dół. Numery pozostają Twoją kolejnością planowania. Przeciągnij kafelek, aby zmienić układ; cały post (zdjęcie, kategoria, format, pomysł i podpis) przesuwa się razem.", balLabel:"Podział na kategorie",
+    btnTable:"Kopiuj jako tabelę", btnCsv:"Pobierz .csv", btnCopy:"Kopiuj jako tekst", btnBackup:"Pobierz kopię", btnRestore:"Wczytaj kopię", btnReset:"Wyczyść", btnLogout:"Wyloguj",
+    helpTitle:"Pomoc i najczęstsze pytania",
+    autosave:"Twoja praca zapisuje się automatycznie w tej przeglądarce. Zmieniasz urządzenie lub przeglądarkę? Pobierz kopię i wczytaj ją tam ponownie.",
+    delPillar:"Usuń kategorię", newPillar:"Nowa kategoria", fmtPh:"format…", choosePillar:"wybierz kategorię",
+    ideaPh:"O czym jest ten post? (jedna linia)", ideaNew:"zaproponuj pomysł", ideaOther:"inny pomysł",
+    corrBtn:"popraw błędy", fixBtn:"przeredaguj", genNew:"Napisz caption", genRe:"Przeredaguj",
+    photoAdd:"+ zdjęcie", photoChange:"zmień zdjęcie", del:"usuń", themeAuto:"temat: auto", dragTitle:"Przeciągnij, aby zmienić kolejność",
+    feedEmpty:"puste", balNone:"Żaden post nie ma jeszcze kategorii.", themePh:"Temat %n (np. promocja sesji w październiku)", delTheme:"Usuń temat",
+    resetArm:"kliknij ponownie, aby wyczyścić",
+    bNoIdea:"najpierw wpisz pomysł", bStep12:"najpierw wypełnij krok 1 lub 2", bStory1:"najpierw wypełnij swoją historię (krok 1)",
+    bThinks:"myśli…", bCorr:"poprawia…", bFix:"przeredagowuje…", bWrite:"pisze…", bNoCap:"brak caption",
+    fSaved:"zapisano ✓", fBuildFirst:"najpierw odpowiedz na kilka pytań", fSummaryUpd:"podsumowanie zaktualizowane ✓",
+    fCopied:"skopiowano ✓", fCopyFail:"kopiowanie nie powiodło się", fTable:"tabela skopiowana ✓ · wklej do Sheets lub Excel",
+    fCsv:"csv pobrany ✓", fDownFailTable:"pobieranie nie powiodło się · użyj Kopiuj jako tabelę", fBackup:"kopia pobrana ✓", fDownFail:"pobieranie nie powiodło się", fBackupLoad:"kopia wczytana ✓", fBackupBad:"nieprawidłowy plik kopii",
+    eUnavail:"AI działa w aplikacji Claude", eHttp:"AI: błąd ", eEmpty:"pusta odpowiedź, jeszcze raz?", eFail:"AI nie zadziałało, jeszcze raz?",
+    xThemes:"Tematy miesiąca:", xCats:"Kategorie:", xStory:"Twoja historia / baza:", xEmpty:"(puste)", xPosts:"Posty:", xNoCat:"brak kategorii", xIdea:"Pomysł: ", xCaption:"Caption:",
+    thNr:"Nr", thCat:"Kategoria", thFmt:"Format", thIdea:"Pomysł", thCap:"Caption", thPhoto:"Zdjęcie", thDate:"Data", thChan:"Kanał", yes:"tak",
+    fmtLabels:{'Reel':'Rolka','Post':'Post','Carrousel':'Karuzela','Talking head video':'Wideo do kamery'}
+  }
+};
+function t(k){ const v = T[lang] && T[lang][k]; return (v!=null) ? v : T.nl[k]; }
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+  renderHelp();
+}
+
+// Inhoud van de hulppagina (tweetalig). Alleen voor deelnemers.
+const HELP = {
+  nl: `
+    <p class="faq-q">Hoe open ik de tool?</p>
+    <p class="faq-a">Je vult je e-mailadres in, krijgt een code per mail en typt die in. Geen code in je mailbox? Kijk even in je spam, en wacht een halve minuut.</p>
+    <p class="faq-q">Is mijn werk bewaard als ik de tool sluit?</p>
+    <p class="faq-a">Ja, je plan wordt automatisch bewaard in je browser. Open je de tool later opnieuw op hetzelfde toestel en dezelfde browser, dan staat alles er nog.</p>
+    <p class="faq-q">Hoe neem ik mijn plan mee naar een ander toestel?</p>
+    <p class="faq-a">Klik onderaan op ‘Back-up downloaden’. Op het andere toestel open je de tool en klik je op ‘Back-up laden’, en kies je dat bestand. Zo verhuist je volledige plan mee.</p>
+    <p class="faq-q">De AI-knoppen doen niets.</p>
+    <p class="faq-a">De AI werkt alleen op de echte tool-link, niet in een voorbeeld-/previewvenster. Zorg dat je via de gedeelde link werkt en ingelogd bent. Lukt het dan nog niet, probeer de knop gewoon opnieuw.</p>
+    <p class="faq-q">De captions klinken niet echt als mij.</p>
+    <p class="faq-a">Vul stap 1 (Jouw verhaal) zo concreet mogelijk in, en plak in de tab ‘Storytelling’ een of meer captions die je zelf eerder schreef. Hoe meer de AI van jou ziet, hoe beter ze je stem nabootst.</p>
+    <p class="faq-q">Hoe wissel ik tussen Nederlands en Pools?</p>
+    <p class="faq-a">Met de NL / PL-knop rechtsboven. De hele tool én de AI schakelen mee van taal.</p>
+    <p class="faq-q">Werkt de tool op mijn telefoon?</p>
+    <p class="faq-a">Ja. Alles werkt, behalve het verslepen van tegels in de feed-preview: dat gaat met een muis of trackpad. Plannen doe je dus het best op een laptop.</p>
+    <p class="faq-q">Ik zie het plan van iemand anders staan.</p>
+    <p class="faq-a">Dat kan enkel als jullie dezelfde browser delen. Klik onderaan op ‘Afmelden’ en log opnieuw in met je eigen e-mailadres; dan krijg je je eigen werkruimte.</p>
+  `,
+  pl: `
+    <p class="faq-q">Jak otwieram narzędzie?</p>
+    <p class="faq-a">Podajesz swój adres e-mail, dostajesz kod mailem i go wpisujesz. Nie ma kodu w skrzynce? Sprawdź spam i poczekaj pół minuty.</p>
+    <p class="faq-q">Czy moja praca zostaje zapisana po zamknięciu narzędzia?</p>
+    <p class="faq-a">Tak, plan zapisuje się automatycznie w Twojej przeglądarce. Jeśli otworzysz narzędzie później na tym samym urządzeniu i w tej samej przeglądarce, wszystko tam będzie.</p>
+    <p class="faq-q">Jak przeniosę plan na inne urządzenie?</p>
+    <p class="faq-a">Kliknij na dole ‘Pobierz kopię’. Na drugim urządzeniu otwórz narzędzie, kliknij ‘Wczytaj kopię’ i wybierz ten plik. Cały plan przeniesie się razem z Tobą.</p>
+    <p class="faq-q">Przyciski AI nic nie robią.</p>
+    <p class="faq-a">AI działa tylko na prawdziwym linku do narzędzia, a nie w oknie podglądu. Upewnij się, że pracujesz przez udostępniony link i jesteś zalogowana. Jeśli dalej nie działa, po prostu kliknij przycisk jeszcze raz.</p>
+    <p class="faq-q">Captiony nie brzmią jak ja.</p>
+    <p class="faq-a">Wypełnij krok 1 (Twoja historia) jak najkonkretniej i wklej w zakładce ‘Storytelling’ jeden lub kilka captionów, które sama wcześniej napisałaś. Im więcej AI zobaczy od Ciebie, tym lepiej odda Twój styl.</p>
+    <p class="faq-q">Jak przełączam między polskim a niderlandzkim?</p>
+    <p class="faq-a">Przyciskiem NL / PL w prawym górnym rogu. Całe narzędzie i AI przełączają się razem z nim.</p>
+    <p class="faq-q">Czy narzędzie działa na telefonie?</p>
+    <p class="faq-a">Tak. Wszystko działa, oprócz przeciągania kafelków w podglądzie feedu: to robi się myszką lub gładzikiem. Najlepiej więc planować na laptopie.</p>
+    <p class="faq-q">Widzę plan kogoś innego.</p>
+    <p class="faq-a">To możliwe tylko, gdy dzielicie tę samą przeglądarkę. Kliknij na dole ‘Wyloguj’ i zaloguj się ponownie swoim adresem e-mail; dostaniesz własną przestrzeń.</p>
+  `
+};
+function renderHelp(){
+  const b = document.getElementById('helpBody');
+  if(b) b.innerHTML = HELP[lang] || HELP.nl;
+}
+
 function defaultPillars(){
+  const n = (lang==='pl')
+    ? ['Edukacja','Inspiracja','Autorytet','Oferta']
+    : ['Educatie','Inspiratie','Autoriteit','Aanbod'];
   return [
-    {id:'a', name:'Educatie',   color:COLORS[2]},
-    {id:'b', name:'Inspiratie', color:COLORS[0]},
-    {id:'c', name:'Autoriteit', color:COLORS[4]},
-    {id:'d', name:'Aanbod',     color:COLORS[3]},
+    {id:'a', name:n[0], color:COLORS[2]},
+    {id:'b', name:n[1], color:COLORS[0]},
+    {id:'c', name:n[2], color:COLORS[4]},
+    {id:'d', name:n[3], color:COLORS[3]},
   ];
 }
 let state = {
   pillars: defaultPillars(),
-  story: {who:'',audience:'',tone:'',offer:'',avoid:'',extra:''},
+  story: {who:'',audience:'',tone:'',offer:'',avoid:'',extra:'',examples:'',instagram:''},
   skill: '',
   themes: ['','','',''],
   posts: Array.from({length:9}, (_,i)=>({id:'p'+i, pillarId:'', idea:'', caption:'', photo:'', format:'', themeIdx:-1})),
@@ -382,24 +587,70 @@ function composeStory(st){
 }
 function ensureStory(st){
   if(!st.story || typeof st.story!=='object'){
-    st.story={who:'',audience:'',tone:'',offer:'',avoid:'',extra:''};
+    st.story={who:'',audience:'',tone:'',offer:'',avoid:'',extra:'',examples:'',instagram:''};
   }
+  if(typeof st.story.examples!=='string') st.story.examples='';
+  if(typeof st.story.instagram!=='string') st.story.instagram='';
   if(typeof st.skill!=='string'){ st.skill = composeStory(st.story); }  // skill = de bewerkbare samenvatting
 }
+/* volledige stem-context voor de AI: samenvatting + eigen voorbeeldcaptions */
+function fullVoice(){
+  let v=(state.skill||'').trim();
+  const st=state.story||{};
+  const ex=(st.examples||'').trim();
+  if(ex) v += (v?'\n\n':'')+'Voorbeelden van mijn eigen captions (neem deze schrijfstijl, ritme en toon over, kopieer ze niet letterlijk):\n'+ex;
+  const ig=(st.instagram||'').trim();
+  if(ig) v += (v?'\n':'')+'Mijn Instagram: '+ig+' (gebruik dit hoogstens in een call-to-action, niet standaard).';
+  return v;
+}
 
-/* ---------- persistentie ---------- */
+/* ---------- persistentie (per ingelogde gebruiker) ---------- */
+// Elke gebruiker krijgt zijn eigen opslag, gekoppeld aan het e-mailadres
+// waarmee hij inlogt via Cloudflare Access. Zo zien twee mensen op dezelfde
+// browser elkaars plan niet. Zonder login (preview/lokaal) is er één gedeelde opslag.
+let USER_NS = '';
+async function resolveUser(){
+  try{
+    const r = await fetch('/cdn-cgi/access/get-identity', {credentials:'same-origin'});
+    if(r.ok){
+      const j = await r.json();
+      const em = ((j && (j.email || j.user_uuid)) || '').toString().trim().toLowerCase();
+      if(em) USER_NS = ':' + em;
+    }
+  }catch(e){ /* geen Cloudflare Access (preview/lokaal): gedeelde opslag */ }
+}
+function kMain(){ return 'smplan:v1' + USER_NS; }
+function kPhotos(){ return 'smplan:v1' + USER_NS + ':photos'; }
+// eenmalige overname: de eerste ingelogde gebruiker na deze update erft het
+// bestaande (nog niet gekoppelde) plan; latere gebruikers starten schoon.
+function adoptLegacy(){
+  if(!USER_NS) return;                       // geen login, niets te doen
+  if(localStorage.getItem(kMain())) return;  // deze gebruiker heeft al eigen data
+  // bestaat er al een andere persoonlijke opslag? dan niet overnemen
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && key.indexOf('smplan:v1:')===0 && key.indexOf(':photos')<0 && key!==kMain()) return;
+  }
+  const legacy = localStorage.getItem('smplan:v1');
+  if(legacy){
+    localStorage.setItem(kMain(), legacy);
+    const lp = localStorage.getItem('smplan:v1:photos');
+    if(lp) localStorage.setItem(kPhotos(), lp);
+  }
+}
 async function save(){
   try{
     const photos={};
     const lean = {...state, posts: state.posts.map(p=>{ if(p.photo) photos[p.id]=p.photo; const {photo, ...rest}=p; return rest; })};
-    localStorage.setItem('smplan:v1', JSON.stringify(lean));
-    localStorage.setItem('smplan:v1:photos', JSON.stringify(photos));
-    flash('bewaard ✓');
+    localStorage.setItem(kMain(), JSON.stringify(lean));
+    localStorage.setItem(kPhotos(), JSON.stringify(photos));
+    flash(t('fSaved'));
   }catch(e){ /* opslag niet beschikbaar, stil negeren */ }
 }
 async function load(){
+  adoptLegacy();
   try{
-    const r = localStorage.getItem('smplan:v1');
+    const r = localStorage.getItem(kMain());
     if(r){
       const loaded = JSON.parse(r);
       if(loaded.voice && !loaded.skill){ loaded.skill = loaded.voice; }   // migratie oude versie
@@ -410,7 +661,7 @@ async function load(){
     }
   }catch(e){}
   try{
-    const pr = localStorage.getItem('smplan:v1:photos');
+    const pr = localStorage.getItem(kPhotos());
     if(pr){
       const photos = JSON.parse(pr);
       state.posts.forEach(p=>{ if(photos[p.id]) p.photo = photos[p.id]; });
@@ -439,7 +690,7 @@ function renderPillars(){
     inp.value = p.name; inp.size = Math.max(p.name.length,6);
     inp.oninput = ()=>{ p.name=inp.value; inp.size=Math.max(inp.value.length,6); renderPostSelectors(); renderFeed(); renderBalance(); debSave(); };
     const x = document.createElement('button');
-    x.className='x'; x.textContent='×'; x.title='Verwijder pillar';
+    x.className='x'; x.textContent='×'; x.title=t('delPillar');
     x.onclick = ()=>{ state.pillars = state.pillars.filter(q=>q.id!==p.id);
       state.posts.forEach(po=>{ if(po.pillarId===p.id) po.pillarId=''; });
       renderAll(); debSave(); };
@@ -450,7 +701,7 @@ function renderPillars(){
 document.getElementById('addPillar').onclick = ()=>{
   const used = state.pillars.map(p=>p.color);
   const color = COLORS.find(c=>!used.includes(c)) || COLORS[state.pillars.length % COLORS.length];
-  state.pillars.push({id:'pil'+Date.now(), name:'Nieuwe pillar', color});
+  state.pillars.push({id:'pil'+Date.now(), name:t('newPillar'), color});
   renderAll(); debSave();
 };
 
@@ -484,12 +735,13 @@ function monthPlan(current){
   return lines.join('\n');
 }
 function formatOptions(selVal){
-  let o = `<option value="">formaat…</option>`;
-  FORMATS.forEach(f=>{ o+=`<option value="${f}" ${f===selVal?'selected':''}>${f}</option>`; });
+  let o = `<option value="">${t('fmtPh')}</option>`;
+  const lab=t('fmtLabels');
+  FORMATS.forEach(f=>{ o+=`<option value="${f}" ${f===selVal?'selected':''}>${lab[f]||f}</option>`; });
   return o;
 }
 function pillarOptions(sel){
-  let o = `<option value="">kies een categorie</option>`;
+  let o = `<option value="">${t('choosePillar')}</option>`;
   state.pillars.forEach(p=>{ o+=`<option value="${p.id}" ${p.id===sel?'selected':''}>${escapeHtml(p.name)}</option>`; });
   return o;
 }
@@ -516,13 +768,13 @@ function renderBatch(){
 
     const cell = document.createElement('div'); cell.className='cell-idea';
     const idea = document.createElement('input');
-    idea.className='idea'; idea.placeholder='Waar gaat deze post over? (één regel)';
+    idea.className='idea'; idea.placeholder=t('ideaPh');
     idea.value = post.idea;
     idea.oninput = ()=>{ post.idea=idea.value; debSave(); };
     cell.appendChild(idea);
     const ideaBtn = document.createElement('button');
     ideaBtn.className='photo-btn'; ideaBtn.style.alignSelf='flex-start';
-    ideaBtn.textContent = post.idea ? 'ander idee' : 'stel idee voor';
+    ideaBtn.textContent = post.idea ? t('ideaOther') : t('ideaNew');
     ideaBtn.onclick = ()=>suggestIdea(post, ideaBtn);
     cell.appendChild(ideaBtn);
     if(post.caption){
@@ -534,11 +786,11 @@ function renderBatch(){
       capBtns.style.cssText='display:flex;gap:14px;flex-wrap:wrap';
       const corrBtn = document.createElement('button');
       corrBtn.className='photo-btn';
-      corrBtn.textContent='fouten verbeteren';
+      corrBtn.textContent=t('corrBtn');
       corrBtn.onclick = ()=>correctCaption(post, corrBtn);
       const fixBtn = document.createElement('button');
       fixBtn.className='photo-btn';
-      fixBtn.textContent='herschrijf vlotter';
+      fixBtn.textContent=t('fixBtn');
       fixBtn.onclick = ()=>improveCaption(post, fixBtn);
       capBtns.appendChild(corrBtn); capBtns.appendChild(fixBtn);
       cell.appendChild(capBtns);
@@ -546,7 +798,7 @@ function renderBatch(){
 
     const actions = document.createElement('div'); actions.className='row-actions';
     const gen = document.createElement('button');
-    gen.className='gen'; gen.textContent = post.caption ? 'Herschrijf' : 'Schrijf caption';
+    gen.className='gen'; gen.textContent = post.caption ? t('genRe') : t('genNew');
     gen.onclick = ()=>generate(post, gen);
 
     const fileInp = document.createElement('input');
@@ -554,11 +806,11 @@ function renderBatch(){
     fileInp.onchange = ()=>{ if(fileInp.files[0]) addPhoto(post, fileInp.files[0]); };
     const photoBtn = document.createElement('button');
     photoBtn.className='photo-btn';
-    photoBtn.textContent = post.photo ? 'foto wijzigen' : '+ foto';
+    photoBtn.textContent = post.photo ? t('photoChange') : t('photoAdd');
     photoBtn.onclick = ()=>fileInp.click();
 
     const del = document.createElement('button');
-    del.className='del'; del.textContent='verwijder';
+    del.className='del'; del.textContent=t('del');
     del.onclick = ()=>{ state.posts = state.posts.filter(p=>p.id!==post.id); renderAll(); debSave(); };
     actions.appendChild(gen); actions.appendChild(photoBtn); actions.appendChild(fileInp); actions.appendChild(del);
 
@@ -567,7 +819,7 @@ function renderBatch(){
   });
 }
 function themeOptions(selIdx){
-  let o = `<option value="-1">thema: auto</option>`;
+  let o = `<option value="-1">${t('themeAuto')}</option>`;
   state.themes.forEach((t,ti)=>{ const tt=(t||'').trim(); if(!tt) return;
     const disp = tt.length>42 ? tt.slice(0,40)+'…' : tt;
     o += `<option value="${ti}" ${ti===selIdx?'selected':''}>${escapeHtml(disp)}</option>`;
@@ -594,14 +846,18 @@ document.getElementById('addRow').onclick = ()=>{
 function btnMsg(btn, orig, msg, ms){ btn.disabled=false; btn.textContent=msg; setTimeout(()=>{ if(btn.textContent===msg) btn.textContent=orig; }, ms||3200); }
 function aiErr(e){
   const m = (e && e.message) || '';
-  if(m==='unavailable') return 'AI werkt in de Claude-app';
-  if(m.indexOf('http-')===0) return 'AI: fout '+m.replace('http-','');
-  if(m==='leeg') return 'leeg antwoord, opnieuw?';
-  return 'AI lukte niet, opnieuw?';
+  if(m==='unavailable') return t('eUnavail');
+  if(m.indexOf('http-')===0) return t('eHttp')+m.replace('http-','');
+  if(m==='leeg') return t('eEmpty');
+  return t('eFail');
 }
 // De tool praat met je eigen Cloudflare Worker, die de API-sleutel veilig bewaart.
 const AI_WORKER_URL = "https://ai-bug.frosty-morning-f543.workers.dev";
 async function callClaude(sys, usr){
+  // taal van het antwoord afdwingen
+  sys = sys + '\n\nTAAL VAN JE ANTWOORD: ' + (lang==='pl'
+    ? 'Schrijf je volledige antwoord in vlot, natuurlijk Pools (Polski). Geen Nederlands.'
+    : 'Schrijf je volledige antwoord in vlot Belgisch Nederlands.');
   // 1) ingebouwde Claude (werkt wanneer de tool in de Claude-app/viewer opent)
   try{
     const sample = (window.claude && claude.use) ? await claude.use('sample') : null;
@@ -623,8 +879,8 @@ async function callClaude(sys, usr){
 /* ---------- AI: caption verbeteren / herschrijven ---------- */
 /* ---------- AI: enkel fouten verbeteren (woorden ongemoeid) ---------- */
 async function correctCaption(post, btn){
-  if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, 'nog geen caption'); return; }
-  const orig = btn.textContent; btn.disabled=true; btn.textContent='corrigeert…';
+  if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, t('bNoCap')); return; }
+  const orig = btn.textContent; btn.disabled=true; btn.textContent=t('bCorr');
   const sys = `Je bent een taalcorrector voor Belgisch Nederlands. Verbeter ALLEEN de fouten: spelling, dt-fouten, grammatica, leestekens en hoofdletters. Verander NIETS aan de woordkeuze, de zinsbouw, de toon of de lengte. Herschrijf niet en voeg niets toe; je raakt alleen aan wat fout is.
 Behoud de opmaak exact, inclusief alinea's en lege regels. Gebruik nooit een gedachtestreepje (— of –).
 Antwoord met ALLEEN de verbeterde tekst, zonder uitleg of aanhalingstekens.`;
@@ -640,13 +896,13 @@ Antwoord met ALLEEN de verbeterde tekst, zonder uitleg of aanhalingstekens.`;
 
 /* ---------- AI: herschrijven, vlotter maken ---------- */
 async function improveCaption(post, btn){
-  if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, 'nog geen caption'); return; }
-  const orig = btn.textContent; btn.disabled=true; btn.textContent='herschrijft…';
+  if(!(post.caption||'').trim()){ btnMsg(btn, btn.textContent, t('bNoCap')); return; }
+  const orig = btn.textContent; btn.disabled=true; btn.textContent=t('bFix');
   const sys = `Je bent corrector en copywriter in vlot Belgisch Nederlands. Verbeter de aangeleverde caption: haal spel-, grammatica- en dt-fouten eruit, maak de zinnen vlotter en natuurlijker, maar behoud de boodschap, de toon en ongeveer de lengte. Verzin geen nieuwe inhoud.
 Behoud of verbeter de opmaak: korte alinea's met een lege regel ertussen en een CTA op een eigen regel. Lever nooit één blok tekst.
 Gebruik nooit een gedachtestreepje (— of –); gebruik een komma, punt of haakjes.
 Antwoord met ALLEEN de verbeterde caption, zonder uitleg of aanhalingstekens.`;
-  const usr = `${(state.skill||'').trim() ? 'Mijn stem en context:\n'+state.skill.trim()+'\n\n' : ''}Verbeter deze caption:\n${post.caption.trim()}`;
+  const usr = `${fullVoice() ? 'Mijn stem en context:\n'+fullVoice()+'\n\n' : ''}Verbeter deze caption:\n${post.caption.trim()}`;
   try{
     let text = stripDashes(await callClaude(sys, usr));
     if(text){ post.caption = text; renderBatch(); renderFeed(); debSave(); }
@@ -661,7 +917,7 @@ async function generate(post, btn){
   const pillar = state.pillars.find(p=>p.id===post.pillarId);
   if(!post.idea.trim()){ idealess(btn); return; }
   const orig = btn.textContent;
-  btn.disabled=true; btn.textContent='schrijft…';
+  btn.disabled=true; btn.textContent=t('bWrite');
   const sys = `Je bent copywriter en schrijft in vlot Belgisch Nederlands (je-vorm, natuurlijk, geen stijve constructies). Je schrijft social media captions die klinken als een echt mens, nooit als AI.
 BELANGRIJKSTE REGEL: gebruik NOOIT een gedachtestreepje (— of –). Gebruik in de plaats altijd een komma, een punt of haakjes. Dit is een harde regel zonder uitzonderingen.
 Verboden: clichés zoals "In de snel veranderende wereld van vandaag", "ontketen", "naadloos", holle superlatieven, en een muur van hashtags.
@@ -671,7 +927,7 @@ Schrijf ALLEEN de caption zelf, zonder uitleg, aanhalingstekens of titel.`;
   const plan = monthPlan(post);
   const mijnThema = (typeof post.themeIdx==='number' && post.themeIdx>=0 && state.themes[post.themeIdx]) ? state.themes[post.themeIdx].trim() : themeForPost(postNr-1);
   const usr = `Vaste basis van de ondernemer (volg dit strikt voor toon, doelgroep, stijl en aanbod):
-${(state.skill||'').trim() || '(niet opgegeven, hou het dan neutraal maar menselijk)'}
+${fullVoice() || '(niet opgegeven, hou het dan neutraal maar menselijk)'}
 ${mijnThema ? '\nThema voor DEZE post (laat de caption hierbij aansluiten): '+mijnThema+'\n' : ''}${activeThemes().length>1 ? 'Alle thema\u0027s van de maand (de posts rouleren hierdoorheen): '+activeThemes().join(' | ')+'\n' : ''}${plan ? '\nDe hele maandplanning (voor flow en samenhang):\n'+plan+'\n' : ''}
 Deze post is nummer ${postNr} in de reeks.
 Content categorie: ${pillar ? pillar.name : 'niet gekozen'}
@@ -689,7 +945,7 @@ Schrijf de caption zo dat ze past bij het formaat EN bij de plaats van deze post
   }
 }
 function idealess(btn){
-  const orig=btn.textContent; btn.textContent='vul eerst een idee in';
+  const orig=btn.textContent; btn.textContent=t('bNoIdea');
   setTimeout(()=>btn.textContent=orig,1500);
 }
 
@@ -697,7 +953,7 @@ function idealess(btn){
 const IDEA_ANGLES = ['een persoonlijk verhaal','een concrete tip','een veelgemaakte fout','een vraag aan je volgers','een voor-en-na','achter de schermen','een mythe ontkrachten','een quote of inzicht','een snelle how-to','een klantresultaat','een mini-checklist','een dag-in-het-leven'];
 async function suggestIdea(post, btn){
   if(!(state.skill||'').trim() && !activeThemes().length){
-    const o=btn.textContent; btn.textContent='vul eerst stap 1 of 2 in';
+    const o=btn.textContent; btn.textContent=t('bStep12');
     setTimeout(()=>btn.textContent=o,1800); return;
   }
   const pillar = state.pillars.find(p=>p.id===post.pillarId);
@@ -706,7 +962,7 @@ async function suggestIdea(post, btn){
   const plan = monthPlan(post);
   const vermijd = state.posts.filter(p=>(p.idea||'').trim()).map(p=>'- '+p.idea.trim());
   const angle = IDEA_ANGLES[Math.floor(Math.random()*IDEA_ANGLES.length)];
-  const orig = btn.textContent; btn.disabled=true; btn.textContent='denkt na…';
+  const orig = btn.textContent; btn.disabled=true; btn.textContent=t('bThinks');
   const sys = `Je bent een contentstrateeg. Je bedenkt één concreet, origineel post-idee en kiest het best passende formaat.
 Kies het formaat uit deze vier: Reel, Post, Carrousel, Talking head video.
 - Reel: kort en dynamisch, hook-gedreven, geschikt voor beweging, demo of snelle tips.
@@ -716,7 +972,7 @@ Kies het formaat uit deze vier: Reel, Post, Carrousel, Talking head video.
 Antwoord met ALLEEN geldige JSON, zonder inleiding of code-fences: {"idee": "één korte zin, max 15 woorden", "formaat": "Reel"}
 Gebruik nooit een gedachtestreepje (— of –).`;
   const usr = `Wie ik ben en wat ik doe:
-${(state.skill||'').trim() || '(niet opgegeven)'}
+${fullVoice() || '(niet opgegeven)'}
 ${mijnThema ? '\nThema voor DEZE post (bouw het idee hierrond): '+mijnThema : ''}
 ${activeThemes().length>1 ? 'Alle thema\u0027s van de maand (de posts rouleren hierdoorheen, blijf bij het thema voor deze post): '+activeThemes().join(' | ') : ''}
 ${pillar ? '\nContent categorie voor deze post: '+pillar.name : ''}
@@ -745,18 +1001,18 @@ Geef één post-idee met passend formaat.`;
 async function proposeThemes(){
   const btn = document.getElementById('themeBtn');
   if(!(state.skill||'').trim()){
-    const o=btn.textContent; btn.textContent='vul eerst je verhaal in (stap 1)';
+    const o=btn.textContent; btn.textContent=t('bStory1');
     setTimeout(()=>btn.textContent=o,1900); return;
   }
   const emptyCount = state.themes.filter(t=>!(t||'').trim()).length;
   const n = Math.max(emptyCount, 1);   // vul de lege vakjes, minstens 1
-  const orig = btn.textContent; btn.disabled=true; btn.textContent='denkt na…';
+  const orig = btn.textContent; btn.disabled=true; btn.textContent=t('bThinks');
   const sys = `Je bent een contentstrateeg. Je stelt ${n} verschillende maandthema's voor: elk een duidelijke, aparte invalshoek die als rode draad door de content kan lopen. Ze moeten onderling verschillen, zodat de maand afwisselt.
 Elk thema is een korte zin (een themanaam, eventueel met een paar woorden uitleg).
 Schrijf in vlot Belgisch Nederlands. Gebruik nooit een gedachtestreepje (— of –).
 Antwoord met ALLEEN geldige JSON, zonder inleiding of code-fences: {"themas": ["...", "..."]}`;
   const usr = `Dit is wie ik ben en wat ik doe:
-${state.skill.trim()}
+${fullVoice()}
 ${activeThemes().length ? '\nDeze thema\u0027s heb ik al, geef andere die hierop aanvullen:\n'+activeThemes().map(t=>'- '+t).join('\n')+'\n' : ''}
 Stel ${n} verschillende maandthema's voor.`;
   try{
@@ -813,7 +1069,7 @@ function renderFeed(){
       inner += `<img src="${post.photo}" alt=""><div class="scrim"></div>`;
       if(p) inner += `<span class="pbar" style="background:${HEX[p.color]}"></span>`;
     }
-    inner += `<span class="tname">${p?escapeHtml(p.name):(hasPhoto?'':'leeg')}</span>`;
+    inner += `<span class="tname">${p?escapeHtml(p.name):(hasPhoto?'':window.t('feedEmpty'))}</span>`;
     t.innerHTML = inner;
     t.dataset.idx = i;
     t.draggable = true;
@@ -823,7 +1079,7 @@ function renderFeed(){
     t.addEventListener('drop', onDrop);
     t.addEventListener('dragend', onDragEnd);
     const handle = document.createElement('div');
-    handle.className = 'drag-handle'; handle.textContent = '⋮⋮'; handle.title = 'Sleep om te herschikken';
+    handle.className = 'drag-handle'; handle.textContent = '⋮⋮'; handle.title = window.t('dragTitle');
     t.appendChild(handle);
     el.appendChild(t);
   }
@@ -891,13 +1147,13 @@ function renderBalance(){
   });
   if(assigned===0){
     bar.innerHTML='';
-    const s=document.createElement('div'); s.className='bal-item'; s.textContent='Nog geen posts aan een categorie toegewezen.';
+    const s=document.createElement('div'); s.className='bal-item'; s.textContent=t('balNone');
     leg.appendChild(s);
   }
 }
 
 /* ---------- voice ---------- */
-const STORY_FIELDS = {who:'s-who', audience:'s-audience', tone:'s-tone', offer:'s-offer', avoid:'s-avoid', extra:'skill-extra'};
+const STORY_FIELDS = {who:'s-who', audience:'s-audience', tone:'s-tone', offer:'s-offer', avoid:'s-avoid', extra:'skill-extra', examples:'s-examples', instagram:'s-instagram'};
 const storyEls = {};
 Object.keys(STORY_FIELDS).forEach(key=>{
   const el = document.getElementById(STORY_FIELDS[key]);
@@ -910,10 +1166,10 @@ summaryEl.oninput = ()=>{ state.skill=summaryEl.value; debSave(); };
 // antwoorden omzetten naar de samenvatting
 document.getElementById('buildSummary').onclick = ()=>{
   const txt = composeStory(state.story);
-  if(!txt){ flash('vul eerst enkele vragen in'); return; }
+  if(!txt){ flash(t('fBuildFirst')); return; }
   state.skill = txt; summaryEl.value = txt; debSave();
   switchStoryTab('tab-summary');
-  flash('samenvatting bijgewerkt ✓');
+  flash(t('fSummaryUpd'));
 };
 // tabbladen
 function switchStoryTab(id){
@@ -921,14 +1177,23 @@ function switchStoryTab(id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.id===id));
 }
 document.querySelectorAll('.tab-btn').forEach(b=>{ b.onclick=()=>switchStoryTab(b.dataset.tab); });
+// taalknoppen NL / PL
+document.querySelectorAll('.lang-btn').forEach(b=>{
+  b.onclick = ()=>{
+    if(b.dataset.lang===lang) return;
+    lang = b.dataset.lang;
+    try{ localStorage.setItem('smplan:lang', lang); }catch(e){}
+    renderAll();
+  };
+});
 function renderThemes(){
   const el = document.getElementById('themes'); el.innerHTML='';
   state.themes.forEach((t,i)=>{
     const row=document.createElement('div'); row.className='theme-row';
     const nr=document.createElement('span'); nr.className='tnr'; nr.textContent=String(i+1).padStart(2,'0');
-    const inp=document.createElement('input'); inp.value=t||''; inp.placeholder='Thema '+(i+1)+' (bv. City shoot in oktober promoten)';
+    const inp=document.createElement('input'); inp.value=t||''; inp.placeholder=window.t('themePh').replace('%n', i+1);
     inp.oninput=()=>{ state.themes[i]=inp.value; renderPostThemeSelects(); debSave(); };
-    const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Verwijder thema';
+    const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title=window.t('delTheme');
     x.onclick=()=>{ state.posts.forEach(p=>{ if(p.themeIdx===i) p.themeIdx=-1; else if(typeof p.themeIdx==='number'&&p.themeIdx>i) p.themeIdx--; }); state.themes.splice(i,1); if(!state.themes.length) state.themes=['']; renderThemes(); renderPostThemeSelects(); debSave(); };
     row.appendChild(nr); row.appendChild(inp); row.appendChild(x);
     el.appendChild(row);
@@ -942,20 +1207,20 @@ function themeForPost(index){ const ts=activeThemes(); return ts.length ? ts[ind
 /* ---------- kopieer / reset ---------- */
 document.getElementById('copyBtn').onclick = ()=>{
   let out = `CONTENT BATCH\n\n`;
-  if(activeThemes().length) out += `Thema's van de maand:\n`+activeThemes().map(t=>'• '+t).join('\n')+`\n\n`;
-  out += `Categorieën:\n`;
+  if(activeThemes().length) out += t('xThemes')+`\n`+activeThemes().map(x=>'• '+x).join('\n')+`\n\n`;
+  out += t('xCats')+`\n`;
   state.pillars.forEach(p=>out+=`• ${p.name}\n`);
-  out+=`\nJouw verhaal / basis:\n${state.skill||'(leeg)'}\n\nPosts:\n`;
+  out+=`\n`+t('xStory')+`\n${state.skill||t('xEmpty')}\n\n`+t('xPosts')+`\n`;
   state.posts.forEach((po,i)=>{
     const p=state.pillars.find(q=>q.id===po.pillarId);
-    out+=`\n${String(i+1).padStart(2,'0')}: ${p?p.name:'geen categorie'}${po.format?' ('+po.format+')':''}\nIdee: ${po.idea||'-'}\n${po.caption?('Caption:\n'+po.caption+'\n'):''}`;
+    out+=`\n${String(i+1).padStart(2,'0')}: ${p?p.name:t('xNoCat')}${po.format?' ('+(t('fmtLabels')[po.format]||po.format)+')':''}\n`+t('xIdea')+`${po.idea||'-'}\n${po.caption?(t('xCaption')+'\n'+po.caption+'\n'):''}`;
   });
-  navigator.clipboard.writeText(out).then(()=>flash('gekopieerd ✓'))
-    .catch(()=>flash('kopiëren lukte niet'));
+  navigator.clipboard.writeText(out).then(()=>flash(t('fCopied')))
+    .catch(()=>flash(t('fCopyFail')));
 };
 
 /* ---------- export naar tabel ---------- */
-const TABLE_HEAD = ['Nr','Categorie','Format','Idee','Caption','Foto','Datum','Kanaal'];
+function tableHead(){ return [t('thNr'),t('thCat'),t('thFmt'),t('thIdea'),t('thCap'),t('thPhoto'),t('thDate'),t('thChan')]; }
 function flatten(s){ return (s||'').replace(/\s*\n+\s*/g,' ').replace(/\t/g,' ').replace(/\s{2,}/g,' ').trim(); }
 function tableRows(flat){
   return state.posts.map((po,i)=>{
@@ -963,55 +1228,55 @@ function tableRows(flat){
     return [
       String(i+1).padStart(2,'0'),
       p ? p.name : '',
-      po.format || '',
+      po.format ? (t('fmtLabels')[po.format]||po.format) : '',
       flat ? flatten(po.idea) : (po.idea||''),
       flat ? flatten(po.caption) : (po.caption||''),
-      po.photo ? 'ja' : '',
+      po.photo ? t('yes') : '',
       '', ''   // Datum en Kanaal: leeg om zelf in te plannen
     ];
   });
 }
 document.getElementById('tableBtn').onclick = ()=>{
-  const tsv = [TABLE_HEAD.join('\t'), ...tableRows(true).map(r=>r.join('\t'))].join('\n');
+  const tsv = [tableHead().join('\t'), ...tableRows(true).map(r=>r.join('\t'))].join('\n');
   navigator.clipboard.writeText(tsv)
-    .then(()=>flash('tabel gekopieerd ✓ · plak in Sheets of Excel'))
-    .catch(()=>flash('kopiëren lukte niet'));
+    .then(()=>flash(t('fTable')))
+    .catch(()=>flash(t('fCopyFail')));
 };
 function csvCell(v){ v=(v==null?'':String(v)); return /[",\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
 document.getElementById('csvBtn').onclick = async ()=>{
-  const rows = [TABLE_HEAD, ...tableRows(false)].map(r=>r.map(csvCell).join(','));
+  const rows = [tableHead(), ...tableRows(false)].map(r=>r.map(csvCell).join(','));
   const csv = '\uFEFF' + rows.join('\r\n');   // BOM = accenten kloppen in Excel
   try{
     const downloads = (window.claude && claude.use) ? await claude.use('downloads') : null;
     if(downloads){
-      await downloads.save({filename:'social-media-plan.csv', data: csv});
-      flash('csv gedownload ✓');
+      await downloads.save({filename:'content-plan.csv', data: csv});
+      flash(t('fCsv'));
       return;
     }
   }catch(e){ /* val terug op de klassieke methode */ }
   try{
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='social-media-plan.csv';
+    const a = document.createElement('a'); a.href=url; a.download='content-plan.csv';
     document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    flash('csv gedownload ✓');
-  }catch(e){ flash('download lukte niet · gebruik Kopieer als tabel'); }
+    flash(t('fCsv'));
+  }catch(e){ flash(t('fDownFailTable')); }
 };
 /* ---------- back-up: hele inhoud downloaden en terug laden ---------- */
 document.getElementById('backupBtn').onclick = async ()=>{
   const json = JSON.stringify(state);
-  const name = 'social-media-plan-backup.json';
+  const name = 'content-plan-backup.json';
   try{
     const downloads = (window.claude && claude.use) ? await claude.use('downloads') : null;
-    if(downloads){ await downloads.save({filename:name, data:json}); flash('back-up gedownload ✓'); return; }
+    if(downloads){ await downloads.save({filename:name, data:json}); flash(t('fBackup')); return; }
   }catch(e){}
   try{
     const blob = new Blob([json], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download=name;
     document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    flash('back-up gedownload ✓');
-  }catch(e){ flash('download lukte niet'); }
+    flash(t('fBackup'));
+  }catch(e){ flash(t('fDownFail')); }
 };
 const restoreInput = document.getElementById('restoreInput');
 document.getElementById('restoreBtn').onclick = ()=>restoreInput.click();
@@ -1028,8 +1293,8 @@ restoreInput.onchange = ()=>{
       ensureStory(loaded);
       state = loaded;
       renderAll(); save();
-      flash('back-up geladen ✓');
-    }catch(e){ flash('ongeldig back-up-bestand'); }
+      flash(t('fBackupLoad'));
+    }catch(e){ flash(t('fBackupBad')); }
     restoreInput.value='';
   };
   reader.readAsText(f);
@@ -1039,12 +1304,12 @@ let resetArmed=false, resetTimer=null;
 document.getElementById('resetBtn').onclick = ()=>{
   const btn=document.getElementById('resetBtn');
   if(!resetArmed){
-    resetArmed=true; btn.textContent='klik nog eens om te wissen';
-    resetTimer=setTimeout(()=>{ resetArmed=false; btn.textContent='Leegmaken'; }, 3000);
+    resetArmed=true; btn.textContent=t('resetArm');
+    resetTimer=setTimeout(()=>{ resetArmed=false; btn.textContent=t('btnReset'); }, 3000);
     return;
   }
-  clearTimeout(resetTimer); resetArmed=false; btn.textContent='Leegmaken';
-  state = { pillars:defaultPillars(), story:{who:'',audience:'',tone:'',offer:'',avoid:'',extra:''}, skill:'', themes:['','','',''],
+  clearTimeout(resetTimer); resetArmed=false; btn.textContent=t('btnReset');
+  state = { pillars:defaultPillars(), story:{who:'',audience:'',tone:'',offer:'',avoid:'',extra:'',examples:'',instagram:''}, skill:'', themes:['','','',''],
     posts: Array.from({length:9},(_,i)=>({id:'p'+i,pillarId:'',idea:'',caption:'',photo:'',format:'',themeIdx:-1})) };
   renderAll(); save();
 };
@@ -1063,13 +1328,32 @@ function stripDashes(s){
 }
 function renderAll(){
   if(!state.story) ensureStory(state);
+  applyLang();
   Object.keys(STORY_FIELDS).forEach(key=>{ if(storyEls[key]) storyEls[key].value = (state.story && state.story[key]) || ''; });
   if(summaryEl) summaryEl.value = state.skill || '';
   renderThemes();
   renderPillars(); renderBatch(); renderFeed(); renderBalance();
 }
 
-load();
+// afmelden: beëindigt de Cloudflare-login; de volgende persoon logt opnieuw in
+document.getElementById('logoutBtn').onclick = ()=>{
+  window.location.href = '/cdn-cgi/access/logout';
+};
+
+// hulppagina openen / sluiten
+(function(){
+  const overlay = document.getElementById('helpOverlay');
+  const openBtn = document.getElementById('helpBtn');
+  const closeBtn = document.getElementById('helpClose');
+  function openHelp(){ renderHelp(); overlay.classList.add('open'); }
+  function closeHelp(){ overlay.classList.remove('open'); }
+  if(openBtn) openBtn.onclick = openHelp;
+  if(closeBtn) closeBtn.onclick = closeHelp;
+  if(overlay) overlay.addEventListener('click', e=>{ if(e.target===overlay) closeHelp(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeHelp(); });
+})();
+// opstart: eerst de ingelogde gebruiker ophalen, dan diens eigen plan laden
+(async function init(){ await resolveUser(); load(); })();
 </script>
 </body>
 </html>
